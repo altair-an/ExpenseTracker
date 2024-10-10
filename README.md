@@ -1,18 +1,18 @@
-## Getting Started
+# About
+This is an ongoing passion project done by a friend and I as a practical implementation of what we have learned as first year CS 
+majors. As avid travelers, we would often need to keep track of our expenses and budget on our trips. Often times, we would find 
+ourselves paying for one another in varying situations, which gave rise to the idea for this application. 
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+This app is essentially an expense tracker that is able to properly track and split expenses amongst participants, depending on 
+who helps pay, and how much each participant is responsible for on the bill. The app will then store the debts owed under each 
+participant, and keep a long-standing tracker of the exact credits of each person.
 
-## Folder Structure
+The project is ongoing and we plan to continue working on and adding functionality as we continue to learn more in our CS curriculum.
+Our intention is to eventually implement a GUI for this project for full functionality and capability for more general and ease of use.
 
-The workspace contains two folders by default, where:
+## Completed
+Core functionality of the application has been completed, namely, the Expense object and it's implementation has been completed and
+functioning as intended.
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+### In Progress
+Currently looking to implement the menus needed to access the expense objects and add functionality surrounding it.
