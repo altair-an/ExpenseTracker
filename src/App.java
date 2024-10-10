@@ -111,5 +111,14 @@ public class App {
     }
     */
 
-
+    public static List<Expense> readExpensesFromFile(String fileName) {
+        try {
+            // Deserialize JSON file into a list of Expense objects
+            return mapper.readValue(new File(fileName), 
+                    mapper.getTypeFactory().constructCollectionType(List.class, Expense.class));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
