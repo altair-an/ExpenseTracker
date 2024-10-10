@@ -9,6 +9,13 @@
             "name": "AppTest",
             "request": "launch",
             "mainClass": "AppTest",
+            "projectName": "ExpenseTracker_ac8c8293"
+        },
+        {
+            "type": "java",
+            "name": "AppTest",
+            "request": "launch",
+            "mainClass": "AppTest",
             "projectName": "ExpenseTracker_afa53024"
         },
         {
