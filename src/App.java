@@ -11,7 +11,7 @@ public class App {
 
         List<Person> participants = new ArrayList<>();
         List<Expense> expenses = new ArrayList<>();
-        System.out.println("Testing Branch");
+        System.out.println("Hello World!");
     }
 
     /*
