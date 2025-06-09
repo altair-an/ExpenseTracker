@@ -17,7 +17,7 @@ public class TestReadingJSONFile {
         System.out.println(expenses.get(0));
         
         //getting participants from the expense using Expense's getter
-        List<Person> participants = expenses.get(0).getparticipants();
+        List<Person> participants = expenses.get(0).getParticipants();
         System.out.println("\n~~~~~~Printing participants~~~~~~");
         System.out.println(participants);
         //single out henry
