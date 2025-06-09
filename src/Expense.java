@@ -235,7 +235,7 @@ public class Expense {
                         ////////////////////////////////////////////////
 
                         /////////// OPTION B: ORIGINAL VALUE ///////////
-                        // Add debt record in foreign currency. Reenable this line if you want original value
+                        // adding {lender:amount owed} to borrowPerson's exactDebt Map. Reenable this line if you want original value
                         //borrowPerson.addExactDebt(lenderPerson, debtValue); //REENABLE THIS LINE IF YOU WANT ORIGINAL VALUE
                         ////////////////////////////////////////////////
 
