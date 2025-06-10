@@ -1,10 +1,11 @@
+import java.math.BigDecimal;
 import java.util.*;
 
 public class Person {
     private static int counter;
     private int id;
     private String name;
-    private Map<Person, Double> exactDebt = new HashMap<>(); //Storing exact debt so you know from whom and how much you owe
+    private Map<Person, BigDecimal> exactDebt = new HashMap<>(); //Storing exact debt so you know from whom and how much you owe
 
     public Person(){}
     public Person(String name){
@@ -30,11 +31,11 @@ public class Person {
     Double::sum - Double is the wrapper class, sum is a static method of the wrapper class, and :: allows you to refer the sum method without
     activating/calling it. Allowing you to pass it around as an argument.
     */
-    public void addExactDebt(Person person, double amount){
-        exactDebt.merge(person, amount, Double::sum);
+    public void addExactDebt(Person person, BigDecimal amount){
+        exactDebt.merge(person, amount, BigDecimal::add);
     }
 
-    public Map<Person, Double> getExactDebt(){
+    public Map<Person, BigDecimal> getExactDebt(){
         return exactDebt;
     }
 

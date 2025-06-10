@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,11 +18,11 @@ public class App {
     /*
     This method accepts a list of Expense objects and return a HashMap of person, value pair simplifying all the debts across all expenses. 
     */
-    public static Map<Person, Double> sumCredits(List<Expense> expenses){
-        Map<Person, Double> total = new HashMap<>();
+    public static Map<Person, BigDecimal> sumCredits(List<Expense> expenses){
+        Map<Person, BigDecimal> total = new HashMap<>();
 
         for (Expense expense : expenses) {
-            expense.getConvertedCreditsMap().forEach((person, value) -> total.merge(person, value, Double::sum));
+            expense.getConvertedCreditsMap().forEach((person, value) -> total.merge(person, value, BigDecimal::add));
         }
         return total;
     }

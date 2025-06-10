@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,29 +28,33 @@ public class TestReadingJSONFile {
 
 
 
-        //Expense #1 - Manually setting payers and setting splits
-        String title = "Cocoichiban";
-        double amount = 3000.00;
+        //Adding new expense to the list after reading from file
+        String title = "Matsuya";
+        BigDecimal amount = new BigDecimal("3000.00");
         String date = LocalDate.now().toString();
         Expense e1 = new Expense(title, amount, date);
         expenses.add(e1);
         e1.setParticipants(participants);
 
-        e1.setPayer(henry, 500);
-        e1.setPayer(participants.get(2), 2500);
+        e1.setPayer(henry, new BigDecimal("500.00"));
+        e1.setPayer(participants.get(2), new BigDecimal("2500.00"));
 
             //Manually setting split responsibilities one at the time
-        e1.setSplit(henry, 1000); 
-        e1.setSplit(participants.get(1), 1000);
-        e1.setSplit(participants.get(2), 1000);
+        e1.setSplit(henry, new BigDecimal("1000.00")); 
+        e1.setSplit(participants.get(1), new BigDecimal("1000.00"));
+        e1.setSplit(participants.get(2), new BigDecimal("1000.00"));
 
-        e1.setRate(148.7); 
+        e1.setRate(new BigDecimal("148.7")); 
 
         e1.calculateCredits();
         e1.calculateExactDebt();  
         System.out.println("\n\n" + e1);
 
         System.out.println("JPY to USD: " + e1.getConvertedCreditsMap());
+
+        
+        System.out.println("\n~~~~~Printing expenses List: ~~~~~~");
+        System.out.println(expenses);
     }
 
 

@@ -1,22 +1,24 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class Expense {
     private static int counter;
     private int id;
     private String title;
-    private double amount;
+    private BigDecimal amount;
     private boolean payBack = false;  //indicates if the expense is a payback or not
     private String currencyType;  
-    private double rate;
+    private BigDecimal rate;
     private String date; 
     private List<Person> participants; 
-    private Map<Person, Double> paidBy = new HashMap<>();  //keep track of who paid the expense
-    private Map<Person, Double> splits = new HashMap<>(); //keep track of who's responsible for x amount
-    private Map<Person, Double> credits = new HashMap<>(); //paidby minus splits
-    private Map<Person, Double> creditsConverted = new HashMap<>(); //converted to other currency
+    private Map<Person, BigDecimal> paidBy = new HashMap<>();  //keep track of who paid the expense
+    private Map<Person, BigDecimal> splits = new HashMap<>(); //keep track of who's responsible for x amount
+    private Map<Person, BigDecimal> credits = new HashMap<>(); //paidby minus splits
+    private Map<Person, BigDecimal> creditsConverted = new HashMap<>(); //converted to other currency
 
     public Expense(){}
-    public Expense(String title, double amount, String date){
+    public Expense(String title, BigDecimal amount, String date){
         this.title = title;
         this.amount = amount;
         this.date = date;
@@ -39,11 +41,11 @@ public class Expense {
     }
 
     //amount setter and getter
-    public void setAmount(double amount){
+    public void setAmount(BigDecimal amount){
         this.amount = amount;
     }
 
-    public double getAmount(){
+    public BigDecimal getAmount(){
         return amount;
     }
 
@@ -66,11 +68,11 @@ public class Expense {
     }
 
     //rate setter and getter
-    public void setRate(double rate){
+    public void setRate(BigDecimal rate){
         this.rate = rate;
     }
 
-    public double getRate(){
+    public BigDecimal getRate(){
         return rate;
     }
 
@@ -88,10 +90,11 @@ public class Expense {
     //participants setter and getter
     public void setParticipants(List<Person> participants){
         this.participants = participants;
+        BigDecimal zero = BigDecimal.ZERO; // Using BigDecimal for precision
 
         for (Person person : participants) {
-            paidBy.put(person, 0.0);
-            splits.put(person, 0.0);
+            paidBy.put(person, zero); // Initialize paidBy with zero for each participant
+            splits.put(person, zero); // Initialize splits with zero for each participant
         }
     }
 
@@ -103,12 +106,12 @@ public class Expense {
     Setter method to set payer(s) with amount paid for this expense.
     Parameters:  the payer and the amount paid
     */
-    public void setPayer(Person payer, double paidAmount){
+    public void setPayer(Person payer, BigDecimal paidAmount){
         paidBy.put(payer, paidAmount);
     }
 
 
-    public Map<Person, Double> getPayerMap(){
+    public Map<Person, BigDecimal> getPayerMap(){
         return paidBy;
     }
     
@@ -116,11 +119,11 @@ public class Expense {
     Setter method to set a person and their split of the bill that they're responsible for.
     Parameters: the person and their split amount
     */
-    public void setSplit(Person person, double splitAmount){
+    public void setSplit(Person person, BigDecimal splitAmount){
         splits.put(person, splitAmount);
     }
 
-    public Map<Person, Double> getSplitsMap(){
+    public Map<Person, BigDecimal> getSplitsMap(){
         return splits;
     }
 
@@ -129,7 +132,12 @@ public class Expense {
     participants array and use the setSplit method. 
     */
     public void evenSplit(){
-        double even = amount / participants.size();
+        BigDecimal even = amount.divide(
+            BigDecimal.valueOf(participants.size()),
+      2, // scale: number of decimal places
+            RoundingMode.HALF_UP // rounding mode
+        );
+
         for (int i = 0; i < participants.size(); i++){
             //splits.put(participants.get(i), even); // using the Map's put method directly
             setSplit(participants.get(i), even); // using custom setter method
@@ -153,42 +161,40 @@ public class Expense {
     HashMap (they didn't paid the bill), that amount that they're responsible for will carry over to the credits HashMap.
     */
 
-    // Calculates the credits for each participant based on the paidBy and splits HashMaps in here.
+    // Calculates the credits for each participant based on the paidBy and splits HashMaps in this class.
     // Updates the credits and creditsConverted HashMaps.
     public void calculateCredits(){
-        splits.forEach((key, value) -> {  // checking each participant in the splits HashMap/responsible for the expense
-            if(paidBy.containsKey(key)){
-                double paidAmount = paidBy.get(key);
-                double splitAmount = value;
-                double diffAmount = splitAmount - paidAmount;
+        splits.forEach((key, value) -> {  // checking each participant in the splits HashMap for the expense
+            if(paidBy.containsKey(key)){ // if you paid for the expense
+                BigDecimal paidAmount = paidBy.get(key);
+                BigDecimal splitAmount = value;
+                BigDecimal diffAmount = splitAmount.subtract(paidAmount);
 
                 //add the difference to the credits HashMap in foreign currency
                 credits.put(key, diffAmount);
 
                 //add the converted amount to the creditsConverted HashMap
-                double newValue = diffAmount / rate;
-                newValue = Double.parseDouble(String.format("%.2f", newValue));
+                BigDecimal newValue = diffAmount.divide(rate, 2, RoundingMode.HALF_UP);
                 creditsConverted.put(key, newValue);
 
-            } else if(!paidBy.containsKey(key)){
+            } else if(!paidBy.containsKey(key)){ // if you didn't pay for the expense
                 //add the split value to the credits HashMap in foreign currency
                 credits.put(key, value);
 
                 //add the converted split value to the creditsConverted HashMap
-                double newValue = value / rate;
-                newValue = Double.parseDouble(String.format("%.2f", newValue));
+                BigDecimal newValue = value.divide(rate, 2, RoundingMode.HALF_UP);
                 creditsConverted.put(key, newValue);
             }
         });      
     }
 
     //Getter for the credits HashMap
-    public Map<Person, Double> getCreditsMap(){
+    public Map<Person, BigDecimal> getCreditsMap(){
         return credits;
     }
 
     // This map contains the converted credits for each participant based on the exchange rate.
-    public Map<Person, Double> getConvertedCreditsMap(){
+    public Map<Person, BigDecimal> getConvertedCreditsMap(){
         return creditsConverted;
     }
 
@@ -210,28 +216,28 @@ public class Expense {
     // This method will update the borrower's Person class exactDebt Map with the lender and the amount owed - {lender:amount}.
     public void calculateExactDebt() {
         // For-loop to find the borrower (positive value)
-        for (Map.Entry<Person, Double> entry : credits.entrySet()) {
+        for (Map.Entry<Person, BigDecimal> entry : credits.entrySet()) {
             Person borrowPerson = entry.getKey();
-            double borrowedAmount = entry.getValue();
+            BigDecimal borrowedAmount = entry.getValue();
             
-            if (borrowedAmount > 0) { // Find the borrower if positive value
+            if (borrowedAmount.compareTo(BigDecimal.ZERO) > 0) { // Find the borrower if positive value
                 // For-loop to find the lender (negative value)
-                for (Map.Entry<Person, Double> entryB : credits.entrySet()) {
+                for (Map.Entry<Person, BigDecimal> entryB : credits.entrySet()) {
                     Person lenderPerson = entryB.getKey();
-                    double lentAmount = entryB.getValue();
+                    BigDecimal lentAmount = entryB.getValue();
     
-                    if (borrowedAmount <= 0) break; // Exit this loop when the borrower's balance is settled (non positive)
+                    if (borrowedAmount.compareTo(BigDecimal.ZERO) <= 0) break; // Exit this loop when the borrower's balance is settled (non positive)
     
-                    if (lentAmount < 0) { // Find the lender, negative value
+                    if (lentAmount.compareTo(BigDecimal.ZERO) < 0) { // Find the lender, negative value
                         // Get the smaller value between the lender and borrower. Need to abs value of the lender since it's negative.
                         // Ex. [A = -140 , B = 70, C = 70] If comparing A and B, then debtValue will be 70 = min(abs(-140), 70).
-                        double debtValue = Math.min(Math.abs(lentAmount), borrowedAmount); 
+                        BigDecimal absLentAmount = lentAmount.abs();
+                        BigDecimal debtValue = absLentAmount.min(borrowedAmount);
                         
                         /////////// OPTION A: CONVERTED VALUE ///////////
                         // Converting the debtValue to USD(or whatever currency rate) to add to the person's debt record
                         // Disable the three statements below and enable the statement after these three if you want original value
-                        double convertedValue = debtValue / rate;
-                        convertedValue = Double.parseDouble(String.format("%.2f", convertedValue));
+                        BigDecimal convertedValue = debtValue.divide(rate, 2, RoundingMode.HALF_UP); 
                         borrowPerson.addExactDebt(lenderPerson, convertedValue); // adding {lender:amount owed} to borrowPerson's exactDebt Map
                         ////////////////////////////////////////////////
 
@@ -242,10 +248,10 @@ public class Expense {
 
                         // Settling the the debt this round. 
                         // If borrower still has remaining debt(positive value) then the for loop will continue to the next person with a negative value
-                        borrowedAmount -= debtValue; 
+                        borrowedAmount.subtract(debtValue); 
     
                         // Update the credits for lenderPerson to reflect settled debt
-                        credits.put(lenderPerson, lentAmount + debtValue);
+                        credits.put(lenderPerson, lentAmount.add(debtValue));
                     }
                 }
                 // Update credits for borrowPerson with the remaining balance after settling debts
@@ -312,24 +318,24 @@ public class Expense {
         //Payers
         s += "\nPaid by: {";
         String data = "";
-        for (Map.Entry<Person, Double> pair : paidBy.entrySet()) {
-            if (pair.getValue() != 0.0) data += " " + pair.getKey() + "=" + pair.getValue() + ",";
+        for (Map.Entry<Person, BigDecimal> pair : paidBy.entrySet()) {
+            if (pair.getValue().compareTo(BigDecimal.ZERO) != 0.0) data += " " + pair.getKey() + "=" + pair.getValue() + ",";
         }
         s += data.trim().replaceAll(",$", "") + "}";
         
         //Splits
         s += "\nSplits: {";
         data = "";
-        for (Map.Entry<Person, Double> pair : splits.entrySet()) {
-            if (pair.getValue() != 0.0) data += " " + pair.getKey() + "=" + pair.getValue() + ",";
+        for (Map.Entry<Person, BigDecimal> pair : splits.entrySet()) {
+            if (pair.getValue().compareTo(BigDecimal.ZERO) != 0.0) data += " " + pair.getKey() + "=" + pair.getValue() + ",";
         }
         s += data.trim().replaceAll(",$", "") + "}";
         
         //Credits
         s += "\nCredits: {";
         data = "";
-        for (Map.Entry<Person, Double> pair : credits.entrySet()) {
-            if (pair.getValue() != 0.0) data += " " + pair.getKey() + "=" + pair.getValue() + ",";
+        for (Map.Entry<Person, BigDecimal> pair : credits.entrySet()) {
+            if (pair.getValue().compareTo(BigDecimal.ZERO) != 0.0) data += " " + pair.getKey() + "=" + pair.getValue() + ",";
         }
         s += data.trim().replaceAll(",$", "") + "}";
 

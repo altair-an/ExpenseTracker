@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,22 +17,22 @@ public class AppTest {
         Person khoa = new Person("Khoa"); participants.add(khoa);
 
         //Expense #1 - Manually setting payers and setting splits
-        String title = "Cocoichiban";
-        double amount = 3000.00;
+        String title = "Cocoichiban2";
+        BigDecimal amount = new BigDecimal("3000.00");
         String date = LocalDate.now().toString();
         Expense e1 = new Expense(title, amount, date);
         expenses.add(e1);
         e1.setParticipants(participants);
 
-        e1.setPayer(henry, 500);
-        e1.setPayer(khoa, 2500);
+        e1.setPayer(henry, new BigDecimal("500"));
+        e1.setPayer(khoa, new BigDecimal("2500"));
 
             //Manually setting split responsibilities one at the time
-        e1.setSplit(henry, 1000); 
-        e1.setSplit(van, 1000);
-        e1.setSplit(khoa, 1000);
+        e1.setSplit(henry, new BigDecimal("1000")); 
+        e1.setSplit(van, new BigDecimal("1000"));
+        e1.setSplit(khoa, new BigDecimal("1000"));
 
-        e1.setRate(148.7); 
+        e1.setRate(new BigDecimal("148.7")); 
 
         e1.calculateCredits();
         e1.calculateExactDebt();  
@@ -42,15 +43,15 @@ public class AppTest {
         
         //Expense #2 - Testing evenSplit methods from Expense class
         String date2 = "2024-10-02";
-        Expense e2 = new Expense("7-11", 6000, date2);
+        Expense e2 = new Expense("7-11", new BigDecimal("6000"), date2);
         expenses.add(e2);
         e2.setParticipants(participants);
         
-        e2.setPayer(van, 6000);
+        e2.setPayer(van, new BigDecimal("6000"));
 
         e2.evenSplit();
 
-        e2.setRate(155);
+        e2.setRate(new BigDecimal("155"));
         
         e2.calculateCredits();
         e2.calculateExactDebt();
@@ -61,16 +62,16 @@ public class AppTest {
         //Expense #3
         String strDate = "2024-10-04";
 
-        Expense e3 = new Expense("Snacks", 2000, strDate);
+        Expense e3 = new Expense("Snacks", new BigDecimal("2000"), strDate);
         expenses.add(e3);
         e3.setParticipants(participants);
 
-        e3.setPayer(van, 2000);
+        e3.setPayer(van, new BigDecimal("2000"));
 
-        e3.setSplit(van, 1000);
-        e3.setSplit(henry, 1000);
+        e3.setSplit(van, new BigDecimal("1000"));
+        e3.setSplit(henry, new BigDecimal("1000"));
 
-        e3.setRate(145);
+        e3.setRate(new BigDecimal("145"));
 
         e3.calculateCredits();
         System.out.println("\n\n" + e3);
@@ -95,11 +96,11 @@ public class AppTest {
     /*
     This method accepts a list of Expense objects and return a HashMap of person, value pair simplifying all the debts across all expenses. 
     */
-    public static Map<Person, Double> sumCredits(List<Expense> expenses){
-        Map<Person, Double> total = new HashMap<>();
+    public static Map<Person, BigDecimal> sumCredits(List<Expense> expenses){
+        Map<Person, BigDecimal> total = new HashMap<>();
 
         for (Expense expense : expenses) {
-            expense.getConvertedCreditsMap().forEach((person, value) -> total.merge(person, value, Double::sum));
+            expense.getConvertedCreditsMap().forEach((person, value) -> total.merge(person, value, BigDecimal::add));
         }
         return total;
     }
