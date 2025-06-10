@@ -61,7 +61,7 @@ public class AppTest {
         //Expense #3
         String strDate = "2024-10-04";
 
-        Expense e3 = new Expense("Snacks", 20, strDate);
+        Expense e3 = new Expense("Snacks", 2000, strDate);
         expenses.add(e3);
         e3.setParticipants(participants);
 

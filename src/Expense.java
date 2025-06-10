@@ -131,8 +131,8 @@ public class Expense {
     public void evenSplit(){
         double even = amount / participants.size();
         for (int i = 0; i < participants.size(); i++){
-            //splits.put(participants.get(i), even);
-            setSplit(participants.get(i), even);
+            //splits.put(participants.get(i), even); // using the Map's put method directly
+            setSplit(participants.get(i), even); // using custom setter method
         }
     }
 
@@ -197,60 +197,62 @@ public class Expense {
     Positive credit means that you borrowed that amount (like a credit card). 
     Negative credit means that someone owes you money and the value is the amount you (the lender) have lent.
     In the given example above, A lent 140 while B and C both borrowed 70 each. 
-    Each Person object has HashMap<person, value> field called 'exactDebt' and this method will add the lender and amount owed.
-    For instance, this method will add {A=70} to person B and C 'exactDebt' Maps since they both owe A an amount of 70.
+    Each Person object has HashMap<person, value> field called 'exactDebt' and this method will update exactDebt with {lender:amount}.
+    For instance, this method will add {A:70} to person B and C 'exactDebt' Maps since they both owe A an amount of 70.
 
-    This method has an outside for-loop that iterates to find the borrower then the inside for loop that iterates to find the lender.
-    In all cases, the amount that needs to be settled is always the smaller value between the two values (lender and borrower). That smallest value 
-    "debtValue" and lender object will be added to the exactDebt Map in the respective borrower Person object. 
+    This method has an outside for-loop that iterates through 'credits' Map to find the borrower (positive value) then the inside for-loop that iterates to find the lender (negative value).
+    In all cases, the amount that needs to be settled is always the smaller value between the two values (abs(lender) and borrower). 
+    This smallest value between the two will then is used to update borrower's exactDebt and update the lender's credits Map. 
     */
 
-    // Calculates the exact debt for each borrower based on the credits HashMap.
-    // This method assumes that the credits HashMap has been calculated before calling this method.
-    // It will update the borrower's exactDebt Map in Person class with the lender and the amount owed.
+    // Calculates the exact debt for each borrower based on the credits HashMap ONLY. No other Map is used in this method.
+    // This method assumes that the credits HashMap has been calculated before calling this method. credit Map will be updated along the way and will be reset to original values after this method is done
+    // This method will update the borrower's Person class exactDebt Map with the lender and the amount owed - {lender:amount}.
     public void calculateExactDebt() {
+        // For-loop to find the borrower (positive value)
         for (Map.Entry<Person, Double> entry : credits.entrySet()) {
             Person borrowPerson = entry.getKey();
             double borrowedAmount = entry.getValue();
             
             if (borrowedAmount > 0) { // Find the borrower if positive value
-    
+                // For-loop to find the lender (negative value)
                 for (Map.Entry<Person, Double> entryB : credits.entrySet()) {
                     Person lenderPerson = entryB.getKey();
                     double lentAmount = entryB.getValue();
     
-                    if (borrowedAmount <= 0) break; //Exit this loop when the borrower's balance is settled (non positive)
+                    if (borrowedAmount <= 0) break; // Exit this loop when the borrower's balance is settled (non positive)
     
-                    if (lentAmount < 0) { //Find the lender, negative value
-                        //Get the smaller value between the lender and borrower. Need to abs value of the lender since it's negative.
+                    if (lentAmount < 0) { // Find the lender, negative value
+                        // Get the smaller value between the lender and borrower. Need to abs value of the lender since it's negative.
                         // Ex. [A = -140 , B = 70, C = 70] If comparing A and B, then debtValue will be 70 = min(abs(-140), 70).
                         double debtValue = Math.min(Math.abs(lentAmount), borrowedAmount); 
                         
                         /////////// OPTION A: CONVERTED VALUE ///////////
-                        //Converting the debtValue to USD(or whatever currency rate) to add to the person's debt record
-                        //Disable the three statements below and enable the statement after these three if you want original value
+                        // Converting the debtValue to USD(or whatever currency rate) to add to the person's debt record
+                        // Disable the three statements below and enable the statement after these three if you want original value
                         double convertedValue = debtValue / rate;
                         convertedValue = Double.parseDouble(String.format("%.2f", convertedValue));
                         borrowPerson.addExactDebt(lenderPerson, convertedValue); // adding {lender:amount owed} to borrowPerson's exactDebt Map
                         ////////////////////////////////////////////////
 
                         /////////// OPTION B: ORIGINAL VALUE ///////////
-                        // adding {lender:amount owed} to borrowPerson's exactDebt Map. Reenable this line if you want original value
+                        // Adding {lender:amount owed} to borrowPerson's exactDebt Map. Reenable this line if you want original value
                         //borrowPerson.addExactDebt(lenderPerson, debtValue); //REENABLE THIS LINE IF YOU WANT ORIGINAL VALUE
                         ////////////////////////////////////////////////
 
-                        //Settling the the debt for lender or borrower. If borrower still has remaining debt(positive value) then the for loop will continue to the next person with a negative value
+                        // Settling the the debt this round. 
+                        // If borrower still has remaining debt(positive value) then the for loop will continue to the next person with a negative value
                         borrowedAmount -= debtValue; 
     
-                        //Update the credits for lenderPerson to reflect settled debt
+                        // Update the credits for lenderPerson to reflect settled debt
                         credits.put(lenderPerson, lentAmount + debtValue);
                     }
                 }
-                //Update credits for borrowPerson with the remaining balance after settling debts
+                // Update credits for borrowPerson with the remaining balance after settling debts
                 credits.put(borrowPerson, borrowedAmount);
             }
         }
-        calculateCredits(); //Reset the credit HashMap back to original values for other calculations
+        calculateCredits(); // Reset the credit HashMap back to original values for integrity/other methods after calculating exact debts
     }
 
     //attempt#2 - moved this to the calculateCredit

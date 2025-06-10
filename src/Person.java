@@ -24,7 +24,7 @@ public class Person {
 
     /*
     Setter method to add/update the amount owe for that person using HashMap's merge() method.
-    merge() takes in three arguments - a key, a value and a function. Similar for the forEach() method.
+    merge() takes in three arguments - a key, a value and a function similar to the forEach() method.
     If the key does not exist in the HashMap, merge() will insert the key and value argument like the put() method. 
     If the key exists with a value, merge() will call given function to operate on the amount argument and the current value of the key. 
     Double::sum - Double is the wrapper class, sum is a static method of the wrapper class, and :: allows you to refer the sum method without
@@ -47,6 +47,19 @@ public class Person {
     //For debugging while testing the expense class printing out results
     public String toString(){
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return id == person.id; // or use name.equals(person.name) if name is unique
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id); // or Objects.hash(name) if name is unique
     }
 
 
