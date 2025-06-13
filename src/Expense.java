@@ -98,6 +98,19 @@ public class Expense {
         }
     }
 
+    public void setParticipant(Person participant){
+        if (participants == null) {
+            participants = new ArrayList<>();
+        }
+        BigDecimal zero = BigDecimal.ZERO; // Using BigDecimal for precision
+
+        if (!participants.contains(participant)) {
+            participants.add(participant); 
+            paidBy.put(participant, zero); // Initialize paidBy with zero for each participant
+            splits.put(participant, zero); // Initialize splits with zero for each participant
+        }
+    }
+
     public List<Person> getParticipants(){
         return participants;
     }
@@ -163,31 +176,17 @@ public class Expense {
 
     // Calculates the credits for each participant based on the paidBy and splits HashMaps in this class.
     // Updates the credits and creditsConverted HashMaps.
-    public void calculateCredits(){
-        splits.forEach((key, value) -> {  // checking each participant in the splits HashMap for the expense
-            if(paidBy.containsKey(key)){ // if you paid for the expense
-                BigDecimal paidAmount = paidBy.get(key);
-                BigDecimal splitAmount = value;
-                BigDecimal diffAmount = splitAmount.subtract(paidAmount);
-
-                //add the difference to the credits HashMap in foreign currency
-                credits.put(key, diffAmount);
-
-                //add the converted amount to the creditsConverted HashMap
-                BigDecimal newValue = diffAmount.divide(rate, 2, RoundingMode.HALF_UP);
-                creditsConverted.put(key, newValue);
-
-            } else if(!paidBy.containsKey(key)){ // if you didn't pay for the expense
-                //add the split value to the credits HashMap in foreign currency
-                credits.put(key, value);
-
-                //add the converted split value to the creditsConverted HashMap
-                BigDecimal newValue = value.divide(rate, 2, RoundingMode.HALF_UP);
-                creditsConverted.put(key, newValue);
-            }
-        });      
+    public void calculateCredits() {
+        for (Person person : participants) {
+            BigDecimal paidAmount = paidBy.getOrDefault(person, BigDecimal.ZERO);
+            BigDecimal splitAmount = splits.getOrDefault(person, BigDecimal.ZERO);
+            BigDecimal diffAmount = splitAmount.subtract(paidAmount);
+    
+            credits.put(person, diffAmount);
+            BigDecimal newValue = diffAmount.divide(rate, 2, RoundingMode.HALF_UP);
+            creditsConverted.put(person, newValue);
+        }
     }
-
     //Getter for the credits HashMap
     public Map<Person, BigDecimal> getCreditsMap(){
         return credits;
