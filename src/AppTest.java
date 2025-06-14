@@ -31,11 +31,11 @@ public class AppTest {
         expense1.setPayer(participants.get(2), new BigDecimal("4000.00")); // khoa paid 2500
 
         expense1.evenSplit(); // even split
-        expense1.setRate(new BigDecimal("148.7")); //setting rate
+        expense1.setCurrencyRate(new BigDecimal("148.7")); //setting rate
 
 
         trip.addExpense(expense1);
-        expense1.calculateCredits();
+        expense1.calculateExpense();
         expense1.calculateExactDebt(); 
         
         //Expense2 set up - manual splits
@@ -50,18 +50,30 @@ public class AppTest {
         expense2.setSplit(participants.get(0), new BigDecimal("1000.00")); // henry's split
         expense2.setSplit(participants.get(1), new BigDecimal("1000.00")); // van's split
         expense2.setSplit(participants.get(2), new BigDecimal("1000.00")); // khoa's split
-        expense2.setRate(new BigDecimal("148.7")); //setting rate
+        expense2.setCurrencyRate(new BigDecimal("148.7")); //setting rate
         
         trip.addExpense(expense2);
-        expense2.calculateCredits();
+        expense2.calculateExpense();
         expense2.calculateExactDebt();
 
         // Print out the expenses
         System.out.println("\n~~~~~Printing expenses List: ~~~~~~");
         for (Expense expense : trip.getExpenseList()) {
             System.out.println(expense);
+            System.out.println("USD value: "  + expense.getExpenseBalanceConverted());
             System.out.println();
         }
+        // Print out the participants and their exact debts
+        System.out.println("\n~~~~~~Printing participants' exact debt~~~~~~");
+        for (Person participant : trip.getParticipantsList()) {
+            System.out.println(participant + " owes: YEN" + participant.getExactDebt() + " USD" + participant.getExactDebtConverted());
+        }
+        // Print out the total balance of all expenses
+        System.out.println("\n~~~~~~Printing total balance of all expenses/simplified debt~~~~~~");
+        Map<Person, BigDecimal> totalBalance = trip.calculateTotalExpense();
+        System.out.println("YEN " + totalBalance);
+        Map<Person, BigDecimal> totalBalanceConverted = trip.calculateTotalExpenseConverted();
+        System.out.println("USD " + totalBalanceConverted);
 
         // // OLD DRIVER CODE BELOW
         // List<Expense> expenses = new ArrayList<>();
@@ -150,11 +162,11 @@ public class AppTest {
     /*
     This method accepts a list of Expense objects and return a HashMap of person, value pair simplifying all the debts across all expenses. 
     */
-    public static Map<Person, BigDecimal> sumCredits(List<Expense> expenses){
+    public static Map<Person, BigDecimal> sumExpenseBalance (List<Expense> expenses){
         Map<Person, BigDecimal> total = new HashMap<>();
 
         for (Expense expense : expenses) {
-            expense.getConvertedCreditsMap().forEach((person, value) -> total.merge(person, value, BigDecimal::add));
+            expense.getExpenseBalanceConverted().forEach((person, value) -> total.merge(person, value, BigDecimal::add));
         }
         return total;
     }

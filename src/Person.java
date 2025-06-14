@@ -6,6 +6,7 @@ public class Person {
     private int id;
     private String name;
     private Map<Person, BigDecimal> exactDebt = new HashMap<>(); //Storing exact debt so you know from whom and how much you owe
+    private Map<Person, BigDecimal> exactDebtConverted = new HashMap<>();
 
     public Person(){}
     public Person(String name){
@@ -39,6 +40,15 @@ public class Person {
         return exactDebt;
     }
 
+    // Same but for converted amount
+    public void addExactDebtConverted(Person person, BigDecimal amount){
+        exactDebtConverted.merge(person, amount, BigDecimal::add);
+    }
+    
+    public Map<Person, BigDecimal> getExactDebtConverted(){
+        return exactDebtConverted;
+    }
+
     /*
     public String toString(){  //Needed?
         return "Name: " + name + "\tID: " + id + "\tBalance: " + balance;
@@ -55,12 +65,13 @@ public class Person {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Person person = (Person) o;
-        return id == person.id; // or use name.equals(person.name) if name is unique
+        //return id == person.id; // or use name.equals(person.name) if name is unique
+        return name.equals(person.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id); // or Objects.hash(name) if name is unique
+        return Objects.hash(name); // or Objects.hash(id) 
     }
 
 

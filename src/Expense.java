@@ -9,13 +9,13 @@ public class Expense {
     private BigDecimal amount;
     private boolean payBack = false;  //indicates if the expense is a payback or not
     private String currencyType;  
-    private BigDecimal rate;
+    private BigDecimal currencyRate;
     private String date; 
     private List<Person> participants; 
     private Map<Person, BigDecimal> paidBy = new HashMap<>();  //keep track of who paid the expense
     private Map<Person, BigDecimal> splits = new HashMap<>(); //keep track of who's responsible for x amount
-    private Map<Person, BigDecimal> credits = new HashMap<>(); //paidby minus splits
-    private Map<Person, BigDecimal> creditsConverted = new HashMap<>(); //converted to other currency
+    private Map<Person, BigDecimal> expenseBalance = new HashMap<>(); //paidby minus splits
+    private Map<Person, BigDecimal> expenseBalanceConverted = new HashMap<>(); //converted to other currency
 
     public Expense(){}
     public Expense(String title, BigDecimal amount, String date){
@@ -68,12 +68,12 @@ public class Expense {
     }
 
     //rate setter and getter
-    public void setRate(BigDecimal rate){
-        this.rate = rate;
+    public void setCurrencyRate(BigDecimal rate){
+        this.currencyRate = rate;
     }
 
-    public BigDecimal getRate(){
-        return rate;
+    public BigDecimal getCurrencyRate(){
+        return currencyRate;
     }
 
 
@@ -140,6 +140,17 @@ public class Expense {
         return splits;
     }
 
+        //Getter for the expenseBalance HashMap
+    public Map<Person, BigDecimal> getExpenseBalance(){
+        return expenseBalance;
+    }
+
+    // This map contains the converted expenseBalance for each participant based on the exchange rate.
+    public Map<Person, BigDecimal> getExpenseBalanceConverted(){
+        return expenseBalanceConverted;
+    }
+
+
     /*
     Split the bill amount evenly between all participants. The for loop will iterate through 
     participants array and use the setSplit method. 
@@ -147,7 +158,7 @@ public class Expense {
     public void evenSplit(){
         BigDecimal even = amount.divide(
             BigDecimal.valueOf(participants.size()),
-      2, // scale: number of decimal places
+      3, // scale: number of decimal places
             RoundingMode.HALF_UP // rounding mode
         );
 
@@ -167,61 +178,48 @@ public class Expense {
     /*
     Apparently HashMap got a forEach method! But all the logic has to be done within the method parenthesis (). 
     splits.forEach(   (key, value) -> {some logic statements}   );  //extra space is for readability
-
-    Only need to calculate the credit/difference for participants who are responsible for the expense so we itterate through the splits HashMap. 
-    For now, since we aren't creating an entry for the participants who didn't paid/paid zero in the paidBy HashMap, we need to check if the participants
-    in splits HashMap are also in the paidBy HashMap before doing the necessary calculation. If the responsible/split person is NOT in the paidBy
-    HashMap (they didn't paid the bill), that amount that they're responsible for will carry over to the credits HashMap.
     */
 
-    // Calculates the credits for each participant based on the paidBy and splits HashMaps in this class.
-    // Updates the credits and creditsConverted HashMaps.
-    public void calculateCredits() {
+
+    // Calculates the expenseBalance for each participant based on the paidBy and splits HashMaps in this class.
+    // Updates the expenseBalance and expenseBalanceConverted HashMaps.
+    public void calculateExpense() {
         for (Person person : participants) {
             BigDecimal paidAmount = paidBy.getOrDefault(person, BigDecimal.ZERO);
             BigDecimal splitAmount = splits.getOrDefault(person, BigDecimal.ZERO);
             BigDecimal diffAmount = splitAmount.subtract(paidAmount);
     
-            credits.put(person, diffAmount);
-            BigDecimal newValue = diffAmount.divide(rate, 2, RoundingMode.HALF_UP);
-            creditsConverted.put(person, newValue);
+            expenseBalance.put(person, diffAmount);
+            BigDecimal newValue = diffAmount.divide(currencyRate, 3, RoundingMode.HALF_UP);
+            expenseBalanceConverted.put(person, newValue);
         }
-    }
-    //Getter for the credits HashMap
-    public Map<Person, BigDecimal> getCreditsMap(){
-        return credits;
-    }
-
-    // This map contains the converted credits for each participant based on the exchange rate.
-    public Map<Person, BigDecimal> getConvertedCreditsMap(){
-        return creditsConverted;
     }
 
     /*
-    Calculates the exact debt using the credits HashMap like {A=-140, B=70, C=70}.
-    Positive credit means that you borrowed that amount (like a credit card). 
-    Negative credit means that someone owes you money and the value is the amount you (the lender) have lent.
+    Calculates the exact debt using the expenseBalance HashMap like {A=-140, B=70, C=70}.
+    Positive balance means that you borrowed that amount (like a credit card). 
+    Negative balance means that someone owes you money and the value is the amount you (the lender) have lent.
     In the given example above, A lent 140 while B and C both borrowed 70 each. 
     Each Person object has HashMap<person, value> field called 'exactDebt' and this method will update exactDebt with {lender:amount}.
-    For instance, this method will add {A:70} to person B and C 'exactDebt' Maps since they both owe A an amount of 70.
+    For instance, this method will add {A:70} to person B and C's exactDebt since they both owe A an amount of 70.
 
-    This method has an outside for-loop that iterates through 'credits' Map to find the borrower (positive value) then the inside for-loop that iterates to find the lender (negative value).
-    In all cases, the amount that needs to be settled is always the smaller value between the two values (abs(lender) and borrower). 
-    This smallest value between the two will then is used to update borrower's exactDebt and update the lender's credits Map. 
+    This method has an outside for-loop that iterates through 'expenseBalance' Map to find the borrower (positive value) then the inside for-loop that iterates to find the lender (negative value).
+    In all cases, the amount that needs to be settled is always the smaller value between the two values abs(lender) and borrower. 
+    This smallest value between the two will then is used to update borrower's exactDebt and update the lender's expenseBalance Map. 
     */
 
-    // Calculates the exact debt for each borrower based on the credits HashMap ONLY. No other Map is used in this method.
-    // This method assumes that the credits HashMap has been calculated before calling this method. credit Map will be updated along the way and will be reset to original values after this method is done
+    // Calculates the exact debt for each borrower based on the expenseBalance HashMap ONLY. No other Map is used in this method.
+    // This method assumes that the expenseBalance HashMap has been calculated before calling this method. credit Map will be updated along the way and will be reset to original values after this method is done
     // This method will update the borrower's Person class exactDebt Map with the lender and the amount owed - {lender:amount}.
     public void calculateExactDebt() {
         // For-loop to find the borrower (positive value)
-        for (Map.Entry<Person, BigDecimal> entry : credits.entrySet()) {
+        for (Map.Entry<Person, BigDecimal> entry : expenseBalance.entrySet()) {
             Person borrowPerson = entry.getKey();
             BigDecimal borrowedAmount = entry.getValue();
             
             if (borrowedAmount.compareTo(BigDecimal.ZERO) > 0) { // Find the borrower if positive value
                 // For-loop to find the lender (negative value)
-                for (Map.Entry<Person, BigDecimal> entryB : credits.entrySet()) {
+                for (Map.Entry<Person, BigDecimal> entryB : expenseBalance.entrySet()) {
                     Person lenderPerson = entryB.getKey();
                     BigDecimal lentAmount = entryB.getValue();
     
@@ -232,49 +230,41 @@ public class Expense {
                         // Ex. [A = -140 , B = 70, C = 70] If comparing A and B, then debtValue will be 70 = min(abs(-140), 70).
                         BigDecimal absLentAmount = lentAmount.abs();
                         BigDecimal debtValue = absLentAmount.min(borrowedAmount);
+                        borrowPerson.addExactDebt(lenderPerson, debtValue);
                         
-                        /////////// OPTION A: CONVERTED VALUE ///////////
-                        // Converting the debtValue to USD(or whatever currency rate) to add to the person's debt record
-                        // Disable the three statements below and enable the statement after these three if you want original value
-                        BigDecimal convertedValue = debtValue.divide(rate, 2, RoundingMode.HALF_UP); 
-                        borrowPerson.addExactDebt(lenderPerson, convertedValue); // adding {lender:amount owed} to borrowPerson's exactDebt Map
-                        ////////////////////////////////////////////////
-
-                        /////////// OPTION B: ORIGINAL VALUE ///////////
-                        // Adding {lender:amount owed} to borrowPerson's exactDebt Map. Reenable this line if you want original value
-                        //borrowPerson.addExactDebt(lenderPerson, debtValue); //REENABLE THIS LINE IF YOU WANT ORIGINAL VALUE
-                        ////////////////////////////////////////////////
+                        BigDecimal convertedValue = debtValue.divide(currencyRate, 3, RoundingMode.HALF_UP); 
+                        borrowPerson.addExactDebtConverted(lenderPerson, convertedValue);
 
                         // Settling the the debt this round. 
                         // If borrower still has remaining debt(positive value) then the for loop will continue to the next person with a negative value
                         borrowedAmount.subtract(debtValue); 
     
-                        // Update the credits for lenderPerson to reflect settled debt
-                        credits.put(lenderPerson, lentAmount.add(debtValue));
+                        // Update the expenseBalance for lenderPerson to reflect settled debt
+                        expenseBalance.put(lenderPerson, lentAmount.add(debtValue));
                     }
                 }
-                // Update credits for borrowPerson with the remaining balance after settling debts
-                credits.put(borrowPerson, borrowedAmount);
+                // Update expenseBalance for borrowPerson with the remaining balance after settling debts
+                expenseBalance.put(borrowPerson, borrowedAmount);
             }
         }
-        calculateCredits(); // Reset the credit HashMap back to original values for integrity/other methods after calculating exact debts
+        calculateExpense(); // Reset the credit HashMap back to original values for integrity/other methods after calculating exact debts
     }
 
     //attempt#2 - moved this to the calculateCredit
     // public void calculateCurrencyConversion(){
-    //     credits.forEach((person, value) -> {
+    //     expenseBalance.forEach((person, value) -> {
     //         double newValue = value / rate;
     //         newValue = Double.parseDouble(String.format("%.2f", newValue));
-    //         creditsConverted.put(person, newValue);
+    //         expenseBalanceConverted.put(person, newValue);
     //     });
     // }
 
 
     /* attempt #1 - DONT LIKE IT DUE TO NEEDING TO USE IT EXTERNALLY BECAUSE OF THE PARAMETER
     public void calculateCurrencyConversion(ExchangeRate rate){
-        credits.forEach((person, value) -> {
+        expenseBalance.forEach((person, value) -> {
             double newValue = rate.convertToUSD(value);
-            creditsConverted.put(person, newValue);
+            expenseBalanceConverted.put(person, newValue);
         });
     }
     */
@@ -305,14 +295,14 @@ public class Expense {
         //s += "\n ------------------Details------------------";
         s += "\nPaid by: " + paidBy;
         s += "\nSplit responsible: " + splits;
-        s += "\nCredits/Debts: " + credits;
+        s += "\nexpenseBalance/Debts: " + expenseBalance;
         return s;
     }
         */
     
     //New toString to not print key:value with 0.0 because we now initialize the Map fields with 0.0 as default when adding participants. 
     public String toString(){
-        String s = "ID: " + id + "  | Title: " + title + " | Date(y/m/d): " + date + " | Amount: " + amount;
+        String s = "ID: " + id + "  | Title: " + title + " | Date: " + date + " | Amount: " + amount;
         
         //Payers
         s += "\nPaid by: {";
@@ -330,10 +320,10 @@ public class Expense {
         }
         s += data.trim().replaceAll(",$", "") + "}";
         
-        //Credits
-        s += "\nCredits: {";
+        //expenseBalance
+        s += "\nBalance: {";
         data = "";
-        for (Map.Entry<Person, BigDecimal> pair : credits.entrySet()) {
+        for (Map.Entry<Person, BigDecimal> pair : expenseBalance.entrySet()) {
             if (pair.getValue().compareTo(BigDecimal.ZERO) != 0.0) data += " " + pair.getKey() + "=" + pair.getValue() + ",";
         }
         s += data.trim().replaceAll(",$", "") + "}";

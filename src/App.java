@@ -22,7 +22,7 @@ public class App {
         Map<Person, BigDecimal> total = new HashMap<>();
 
         for (Expense expense : expenses) {
-            expense.getConvertedCreditsMap().forEach((person, value) -> total.merge(person, value, BigDecimal::add));
+            expense.getExpenseBalanceConverted().forEach((person, value) -> total.merge(person, value, BigDecimal::add));
         }
         return total;
     }

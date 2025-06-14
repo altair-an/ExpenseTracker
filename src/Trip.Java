@@ -1,4 +1,6 @@
 import java.util.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class Trip {
     private String trip_name;
@@ -9,6 +11,14 @@ public class Trip {
         this.trip_name = trip_name;
         this.trip_participants = new ArrayList<>();
         this.expense_list = new ArrayList<>();
+    }
+
+    public String getTripName(){
+        return trip_name;
+    }
+
+    public void setTripName(String trip_name){
+        this.trip_name = trip_name;
     }
 
     public void addPerson(String person_name){
@@ -32,7 +42,25 @@ public class Trip {
     }
 
     //Return the total of all expenses? 
-    public void calculateTotalExpense(){}
+    //public void calculateTotalExpense(){}
+
+    public Map<Person, BigDecimal> calculateTotalExpenseConverted(){
+        Map<Person, BigDecimal> total = new HashMap<>();
+
+        for (Expense expense : expense_list) {
+            expense.getExpenseBalanceConverted().forEach((person, value) -> total.merge(person, value, BigDecimal::add));
+        }
+        return total;
+    }
+
+    public Map<Person, BigDecimal> calculateTotalExpense(){
+        Map<Person, BigDecimal> total = new HashMap<>();
+
+        for (Expense expense : expense_list) {
+            expense.getExpenseBalance().forEach((person, value) -> total.merge(person, value, BigDecimal::add));
+        }
+        return total;
+    }
 
     
 }
