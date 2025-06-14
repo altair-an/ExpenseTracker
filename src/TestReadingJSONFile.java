@@ -44,13 +44,13 @@ public class TestReadingJSONFile {
         e1.setSplit(participants.get(1), new BigDecimal("1000.00"));
         e1.setSplit(participants.get(2), new BigDecimal("1000.00"));
 
-        e1.setRate(new BigDecimal("148.7")); 
+        e1.setCurrencyRate(new BigDecimal("148.7")); 
 
-        e1.calculateCredits();
+        e1.calculateExpense();
         e1.calculateExactDebt();  
         System.out.println("\n\n" + e1);
 
-        System.out.println("JPY to USD: " + e1.getConvertedCreditsMap());
+        System.out.println("JPY to USD: " + e1.getExpenseBalanceConverted());
 
         
         System.out.println("\n~~~~~Printing expenses List: ~~~~~~");
