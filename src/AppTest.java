@@ -1,5 +1,4 @@
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -7,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 
 public class AppTest {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         
         //Implementing Trip Class
         String tripName = "Japan 2025";
@@ -19,7 +18,7 @@ public class AppTest {
 
         List<Person> participants = trip.getParticipantsList(); //getting participants from trip class right away 
 
-        //Expense1 set up - Build outside in the driver class
+        //~~~~~~~~~~~~~~~~Expense1 set up - Build outside in the driver class
         Expense expense1 = new Expense();
         expense1.setParticipants(participants);
         expense1.setTitle("Yakiniku Like");
@@ -38,7 +37,7 @@ public class AppTest {
         expense1.calculateExpense();
         expense1.calculateExactDebt(); 
         
-        //Expense2 set up - manual splits
+        //~~~~~~~~~~~~~~~~Expense2 set up - manual splits
         Expense expense2 = new Expense();
         expense2.setParticipants(participants);  
         expense2.setTitle("Comodi iida");
@@ -56,6 +55,26 @@ public class AppTest {
         expense2.calculateExpense();
         expense2.calculateExactDebt();
 
+        //~~~~~~~~~~~~~~~~Expense3 set up - testing exchange rate fetcher
+        Expense expense3 = new Expense();
+        expense3.setParticipants(participants);
+        expense3.setTitle("Uniqlo");
+        expense3.setAmount(new BigDecimal("10000.00"));
+        expense3.setDate(LocalDate.now().toString());
+        
+        expense3.setPayer(participants.get(2), new BigDecimal("10000.00")); // khoa paid 10000
+        
+        expense3.setSplit(participants.get(0), new BigDecimal("5000.00")); // henry's split
+        expense3.setSplit(participants.get(1), new BigDecimal("5000.00")); // van's split
+    
+        BigDecimal rate = ExchangeRateFetcher.getRate("USD", "JPY", LocalDate.now().toString()); // Fetching the exchange rate
+        expense3.setCurrencyRate(rate); 
+
+        trip.addExpense(expense3);
+        expense3.calculateExpense();
+        expense3.calculateExactDebt();
+
+
         // Print out the expenses
         System.out.println("\n~~~~~Printing expenses List: ~~~~~~");
         for (Expense expense : trip.getExpenseList()) {
@@ -66,7 +85,7 @@ public class AppTest {
         // Print out the participants and their exact debts
         System.out.println("\n~~~~~~Printing participants' exact debt~~~~~~");
         for (Person participant : trip.getParticipantsList()) {
-            System.out.println(participant + " owes: YEN" + participant.getExactDebt() + " USD" + participant.getExactDebtConverted());
+            System.out.println(participant + " owes: YEN " + participant.getExactDebt() + " \t\tUSD " + participant.getExactDebtConverted());
         }
         // Print out the total balance of all expenses
         System.out.println("\n~~~~~~Printing total balance of all expenses/simplified debt~~~~~~");

@@ -302,7 +302,7 @@ public class Expense {
     
     //New toString to not print key:value with 0.0 because we now initialize the Map fields with 0.0 as default when adding participants. 
     public String toString(){
-        String s = "ID: " + id + "  | Title: " + title + " | Date: " + date + " | Amount: " + amount;
+        String s = "ID: " + id + "  | Title: " + title + " | Date: " + date + " | Amount: " + amount + " | Rate: " + currencyRate;
         
         //Payers
         s += "\nPaid by: {";
