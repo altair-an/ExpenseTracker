@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "AppTest",
+            "request": "launch",
+            "mainClass": "AppTest",
+            "projectName": "expensetracker"
+        },
+        {
+            "type": "java",
+            "name": "AppTest",
+            "request": "launch",
+            "mainClass": "main.java.AppTest",
+            "projectName": "ExpenseTracker_68343926"
+        },
+        {
+            "type": "java",
             "name": "TestReadingJSONFile",
             "request": "launch",
             "mainClass": "TestReadingJSONFile",
