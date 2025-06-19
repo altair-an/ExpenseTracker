@@ -8,6 +8,13 @@
             "type": "java",
             "name": "AppTest",
             "request": "launch",
+            "mainClass": "com.altair.expensetracker.AppTest",
+            "projectName": "expensetracker"
+        },
+        {
+            "type": "java",
+            "name": "AppTest",
+            "request": "launch",
             "mainClass": "AppTest",
             "projectName": "expensetracker"
         },
