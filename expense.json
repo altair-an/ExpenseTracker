@@ -1,1 +1,161 @@
-[{"id":1,"title":"Cocoichiban2","amount":3000.00,"payBack":false,"currencyType":null,"rate":148.7,"date":"2025-06-12","participants":[{"id":1,"name":"Henry","exactDebt":{"Van":19.80,"Khoa":3.36}},{"id":2,"name":"Van","exactDebt":{"Khoa":6.72}},{"id":3,"name":"Khoa","exactDebt":{"Van":12.90}}],"convertedCreditsMap":{"Henry":3.36,"Van":6.72,"Khoa":-10.09},"payerMap":{"Henry":500,"Van":0,"Khoa":2500},"creditsMap":{"Henry":500,"Van":1000,"Khoa":-1500},"splitsMap":{"Henry":1000,"Van":1000,"Khoa":1000}},{"id":2,"title":"7-11","amount":6000,"payBack":false,"currencyType":null,"rate":155,"date":"2024-10-02","participants":[{"id":1,"name":"Henry","exactDebt":{"Van":19.80,"Khoa":3.36}},{"id":2,"name":"Van","exactDebt":{"Khoa":6.72}},{"id":3,"name":"Khoa","exactDebt":{"Van":12.90}}],"convertedCreditsMap":{"Henry":12.90,"Van":-25.81,"Khoa":12.90},"payerMap":{"Henry":0,"Van":6000,"Khoa":0},"creditsMap":{"Henry":2000.00,"Van":-4000.00,"Khoa":2000.00},"splitsMap":{"Henry":2000.00,"Van":2000.00,"Khoa":2000.00}},{"id":3,"title":"Snacks","amount":2000,"payBack":false,"currencyType":null,"rate":145,"date":"2024-10-04","participants":[{"id":1,"name":"Henry","exactDebt":{"Van":19.80,"Khoa":3.36}},{"id":2,"name":"Van","exactDebt":{"Khoa":6.72}},{"id":3,"name":"Khoa","exactDebt":{"Van":12.90}}],"convertedCreditsMap":{"Henry":6.90,"Van":-6.90,"Khoa":0.00},"payerMap":{"Henry":0,"Van":2000,"Khoa":0},"creditsMap":{"Henry":1000,"Van":-1000,"Khoa":0},"splitsMap":{"Henry":1000,"Van":1000,"Khoa":0}}]
+[
+    {
+        "id": 1,
+        "title": "Cocoichiban2",
+        "amount": 3000.00,
+        "payBack": false,
+        "currencyType": null,
+        "rate": 148.7,
+        "date": "2025-06-12",
+        "participants": [
+            {
+                "id": 1,
+                "name": "Henry",
+                "exactDebt": {
+                    "Van": 19.80,
+                    "Khoa": 3.36
+                }
+            },
+            {
+                "id": 2,
+                "name": "Van",
+                "exactDebt": {
+                    "Khoa": 6.72
+                }
+            },
+            {
+                "id": 3,
+                "name": "Khoa",
+                "exactDebt": {
+                    "Van": 12.90
+                }
+            }
+        ],
+        "convertedCreditsMap": {
+            "Henry": 3.36,
+            "Van": 6.72,
+            "Khoa": -10.09
+        },
+        "payerMap": {
+            "Henry": 500,
+            "Van": 0,
+            "Khoa": 2500
+        },
+        "creditsMap": {
+            "Henry": 500,
+            "Van": 1000,
+            "Khoa": -1500
+        },
+        "splitsMap": {
+            "Henry": 1000,
+            "Van": 1000,
+            "Khoa": 1000
+        }
+    },
+    {
+        "id": 2,
+        "title": "7-11",
+        "amount": 6000,
+        "payBack": false,
+        "currencyType": null,
+        "rate": 155,
+        "date": "2024-10-02",
+        "participants": [
+            {
+                "id": 1,
+                "name": "Henry",
+                "exactDebt": {
+                    "Van": 19.80,
+                    "Khoa": 3.36
+                }
+            },
+            {
+                "id": 2,
+                "name": "Van",
+                "exactDebt": {
+                    "Khoa": 6.72
+                }
+            },
+            {
+                "id": 3,
+                "name": "Khoa",
+                "exactDebt": {
+                    "Van": 12.90
+                }
+            }
+        ],
+        "convertedCreditsMap": {
+            "Henry": 12.90,
+            "Van": -25.81,
+            "Khoa": 12.90
+        },
+        "payerMap": {
+            "Henry": 0,
+            "Van": 6000,
+            "Khoa": 0
+        },
+        "creditsMap": {
+            "Henry": 2000.00,
+            "Van": -4000.00,
+            "Khoa": 2000.00
+        },
+        "splitsMap": {
+            "Henry": 2000.00,
+            "Van": 2000.00,
+            "Khoa": 2000.00
+        }
+    },
+    {
+        "id": 3,
+        "title": "Snacks",
+        "amount": 2000,
+        "payBack": false,
+        "currencyType": null,
+        "rate": 145,
+        "date": "2024-10-04",
+        "participants": [
+            {
+                "id": 1,
+                "name": "Henry",
+                "exactDebt": {
+                    "Van": 19.80,
+                    "Khoa": 3.36
+                }
+            },
+            {
+                "id": 2,
+                "name": "Van",
+                "exactDebt": {
+                    "Khoa": 6.72
+                }
+            },
+            {
+                "id": 3,
+                "name": "Khoa",
+                "exactDebt": {
+                    "Van": 12.90
+                }
+            }
+        ],
+        "convertedCreditsMap": {
+            "Henry": 6.90,
+            "Van": -6.90,
+            "Khoa": 0.00
+        },
+        "payerMap": {
+            "Henry": 0,
+            "Van": 2000,
+            "Khoa": 0
+        },
+        "creditsMap": {
+            "Henry": 1000,
+            "Van": -1000,
+            "Khoa": 0
+        },
+        "splitsMap": {
+            "Henry": 1000,
+            "Van": 1000,
+            "Khoa": 0
+        }
+    }
+]
