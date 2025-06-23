@@ -6,8 +6,8 @@ public class Person {
     private static int counter;
     private int id;
     private String name;
-    private Map<Person, BigDecimal> exactDebt = new HashMap<>(); //Storing exact debt so you know from whom and how much you owe
-    private Map<Person, BigDecimal> exactDebtConverted = new HashMap<>();
+    private Map<Person, BigDecimal> individualBalance = new HashMap<>(); //Storing exact debt so you know from whom and how much you owe
+    private Map<Person, BigDecimal> balanceConverted = new HashMap<>();
 
     public Person(){}
     public Person(String name){
@@ -33,21 +33,21 @@ public class Person {
     Double::sum - Double is the wrapper class, sum is a static method of the wrapper class, and :: allows you to refer the sum method without
     activating/calling it. Allowing you to pass it around as an argument.
     */
-    public void addExactDebt(Person person, BigDecimal amount){
-        exactDebt.merge(person, amount, BigDecimal::add);
+    public void addIndividualBalance(Person person, BigDecimal amount){
+        individualBalance.merge(person, amount, BigDecimal::add);
     }
 
-    public Map<Person, BigDecimal> getExactDebt(){
-        return exactDebt;
+    public Map<Person, BigDecimal> getIndividualBalance(){
+        return individualBalance;
     }
 
     // Same but for converted amount
-    public void addExactDebtConverted(Person person, BigDecimal amount){
-        exactDebtConverted.merge(person, amount, BigDecimal::add);
+    public void addBalanceConverted(Person person, BigDecimal amount){
+        balanceConverted.merge(person, amount, BigDecimal::add);
     }
     
-    public Map<Person, BigDecimal> getExactDebtConverted(){
-        return exactDebtConverted;
+    public Map<Person, BigDecimal> getBalanceConverted(){
+        return balanceConverted;
     }
 
     /*

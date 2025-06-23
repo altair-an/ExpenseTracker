@@ -38,7 +38,7 @@ public class AppTest {
 
         trip.addExpense(expense1);
         expense1.calculateExpense();
-        expense1.calculateExactDebt(); 
+        expense1.calculateIndividualBalances(); 
         
         //~~~~~~~~~~~~~~~~Expense2 set up - manual splits
         Expense expense2 = new Expense();
@@ -56,7 +56,7 @@ public class AppTest {
         
         trip.addExpense(expense2);
         expense2.calculateExpense();
-        expense2.calculateExactDebt();
+        expense2.calculateIndividualBalances();
 
         //~~~~~~~~~~~~~~~~Expense3 set up - testing exchange rate fetcher
         Expense expense3 = new Expense();
@@ -75,7 +75,7 @@ public class AppTest {
 
         trip.addExpense(expense3);
         expense3.calculateExpense();
-        expense3.calculateExactDebt();
+        expense3.calculateIndividualBalances();
 
 
         // Print out the expenses
@@ -88,7 +88,7 @@ public class AppTest {
         // Print out the participants and their exact debts
         System.out.println("\n~~~~~~Printing participants' exact debt~~~~~~");
         for (Person participant : trip.getParticipantsList()) {
-            System.out.println(participant + " owes: YEN " + participant.getExactDebt() + " \t\tUSD " + participant.getExactDebtConverted());
+            System.out.println(participant + " owes: YEN " + participant.getIndividualBalance() + " \t\tUSD " + participant.getBalanceConverted());
         }
         // Print out the total balance of all expenses
         System.out.println("\n~~~~~~Printing total balance of all expenses/simplified debt~~~~~~");
@@ -211,7 +211,7 @@ public class AppTest {
 
         trip.addExpense(expense1);
         expense1.calculateExpense();
-        expense1.calculateExactDebt(); 
+        expense1.calculateIndividualBalances(); 
         
         //~~~~~~~~~~~~~~~~Expense2 set up - manual splits
         Expense expense2 = new Expense();
@@ -229,7 +229,7 @@ public class AppTest {
         
         trip.addExpense(expense2);
         expense2.calculateExpense();
-        expense2.calculateExactDebt();
+        expense2.calculateIndividualBalances();
 
         //~~~~~~~~~~~~~~~~Expense3 set up - testing exchange rate fetcher
         Expense expense3 = new Expense();
@@ -248,7 +248,7 @@ public class AppTest {
 
         trip.addExpense(expense3);
         expense3.calculateExpense();
-        expense3.calculateExactDebt();
+        expense3.calculateIndividualBalances();
 
 
         // Print out the expenses
@@ -261,7 +261,7 @@ public class AppTest {
         // Print out the participants and their exact debts
         System.out.println("\n~~~~~~Printing participants' exact debt~~~~~~");
         for (Person participant : trip.getParticipantsList()) {
-            System.out.println(participant + " owes: YEN " + participant.getExactDebt() + " \t\tUSD " + participant.getExactDebtConverted());
+            System.out.println(participant + " owes: YEN " + participant.getIndividualBalance() + " \t\tUSD " + participant.getBalanceConverted());
         }
         // Print out the total balance of all expenses
         System.out.println("\n~~~~~~Printing total balance of all expenses/simplified debt~~~~~~");

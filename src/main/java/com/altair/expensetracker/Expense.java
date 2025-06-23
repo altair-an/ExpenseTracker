@@ -13,6 +13,8 @@ public class Expense {
     private BigDecimal currencyRate;
     private String date; 
     private List<Person> participants; 
+    private List<Payer> payerList = new ArrayList<>();
+    private List<Splits> splitsList = new ArrayList<>();
     private Map<Person, BigDecimal> paidBy = new HashMap<>();  //keep track of who paid the expense
     private Map<Person, BigDecimal> splits = new HashMap<>(); //keep track of who's responsible for x amount
     private Map<Person, BigDecimal> expenseBalance = new HashMap<>(); //paidby minus splits
@@ -121,7 +123,7 @@ public class Expense {
     Parameters:  the payer and the amount paid
     */
     public void setPayer(Person payer, BigDecimal paidAmount){
-        paidBy.put(payer, paidAmount);
+        payerList.add(new Payer(payer, paidAmount));
     }
 
 
@@ -134,7 +136,7 @@ public class Expense {
     Parameters: the person and their split amount
     */
     public void setSplit(Person person, BigDecimal splitAmount){
-        splits.put(person, splitAmount);
+        splitsList.add(new Splits(person, splitAmount));
     }
 
     public Map<Person, BigDecimal> getSplitsMap(){
@@ -169,11 +171,16 @@ public class Expense {
         }
     }
 
-    //TODO?
-    public void exactSplit(Person person, double amount){
-        //give this method the person and the amount responsible
-        //hmmm....maybe this shouldn't have parameters but when called, it'll just loop through the array of participants
-        //asks for the exact amount and set the splits array manually. probably should have some conditions to prevent error inputs
+    public void updateMaps() {
+        //resetting hashmaps
+        paidBy.clear();
+        splits.clear();
+        for (Payer payer : payerList) {
+            paidBy.merge(payer.getPerson(), payer.getAmount(), BigDecimal::add);
+        }
+        for (Splits split : splitsList) {
+            splits.merge(split.getPerson(), split.getAmount(), BigDecimal::add);
+        }
     }
 
     /*
@@ -185,6 +192,7 @@ public class Expense {
     // Calculates the expenseBalance for each participant based on the paidBy and splits HashMaps in this class.
     // Updates the expenseBalance and expenseBalanceConverted HashMaps.
     public void calculateExpense() {
+        updateMaps();
         for (Person person : participants) {
             BigDecimal paidAmount = paidBy.getOrDefault(person, BigDecimal.ZERO);
             BigDecimal splitAmount = splits.getOrDefault(person, BigDecimal.ZERO);
@@ -212,7 +220,7 @@ public class Expense {
     // Calculates the exact debt for each borrower based on the expenseBalance HashMap ONLY. No other Map is used in this method.
     // This method assumes that the expenseBalance HashMap has been calculated before calling this method. credit Map will be updated along the way and will be reset to original values after this method is done
     // This method will update the borrower's Person class exactDebt Map with the lender and the amount owed - {lender:amount}.
-    public void calculateExactDebt() {
+    public void calculateIndividualBalances() {
         // For-loop to find the borrower (positive value)
         for (Map.Entry<Person, BigDecimal> entry : expenseBalance.entrySet()) {
             Person borrowPerson = entry.getKey();
@@ -231,10 +239,10 @@ public class Expense {
                         // Ex. [A = -140 , B = 70, C = 70] If comparing A and B, then debtValue will be 70 = min(abs(-140), 70).
                         BigDecimal absLentAmount = lentAmount.abs();
                         BigDecimal debtValue = absLentAmount.min(borrowedAmount);
-                        borrowPerson.addExactDebt(lenderPerson, debtValue);
+                        borrowPerson.addIndividualBalance(lenderPerson, debtValue);
                         
                         BigDecimal convertedValue = debtValue.divide(currencyRate, 3, RoundingMode.HALF_UP); 
-                        borrowPerson.addExactDebtConverted(lenderPerson, convertedValue);
+                        borrowPerson.addBalanceConverted(lenderPerson, convertedValue);
 
                         // Settling the the debt this round. 
                         // If borrower still has remaining debt(positive value) then the for loop will continue to the next person with a negative value
