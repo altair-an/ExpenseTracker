@@ -5,6 +5,7 @@
             "title": "Yakiniku Like",
             "amount": 6000.00,
             "payBack": false,
+            "currencyCode": null,
             "currencyRate": 148.7,
             "date": "2025-06-23",
             "participants": [
@@ -39,6 +40,79 @@
                     "balanceConverted": {
                         "Van": 6.725
                     }
+                }
+            ],
+            "payerList": [
+                {
+                    "person": {
+                        "id": 1,
+                        "name": "Henry",
+                        "individualBalance": {
+                            "Van": 1000.00,
+                            "Khoa": 5000.00
+                        },
+                        "balanceConverted": {
+                            "Van": 6.725,
+                            "Khoa": 33.887
+                        }
+                    },
+                    "amount": 2000.00
+                },
+                {
+                    "person": {
+                        "id": 3,
+                        "name": "Khoa",
+                        "individualBalance": {
+                            "Van": 1000.00
+                        },
+                        "balanceConverted": {
+                            "Van": 6.725
+                        }
+                    },
+                    "amount": 4000.00
+                }
+            ],
+            "splitsList": [
+                {
+                    "person": {
+                        "id": 1,
+                        "name": "Henry",
+                        "individualBalance": {
+                            "Van": 1000.00,
+                            "Khoa": 5000.00
+                        },
+                        "balanceConverted": {
+                            "Van": 6.725,
+                            "Khoa": 33.887
+                        }
+                    },
+                    "amount": 2000.000
+                },
+                {
+                    "person": {
+                        "id": 2,
+                        "name": "Van",
+                        "individualBalance": {
+                            "Khoa": 7000.000
+                        },
+                        "balanceConverted": {
+                            "Khoa": 47.337
+                        }
+                    },
+                    "amount": 2000.000
+                },
+                {
+                    "person": {
+                        "id": 3,
+                        "name": "Khoa",
+                        "individualBalance": {
+                            "Van": 1000.00
+                        },
+                        "balanceConverted": {
+                            "Van": 6.725
+                        }
+                    },
+                    "amount": 2000.000
                 }
             ],
             "splitsMap": {
@@ -56,7 +130,6 @@
                 "Van": 13.450,
                 "Khoa": -13.450
             },
-            "currencyType": null,
             "payerMap": {
                 "Henry": 2000.00,
                 "Khoa": 4000.00
@@ -67,6 +140,7 @@
             "title": "Comodi iida",
             "amount": 3000.00,
             "payBack": false,
+            "currencyCode": null,
             "currencyRate": 148.7,
             "date": "2025-06-23",
             "participants": [
@@ -103,6 +177,64 @@
                     }
                 }
             ],
+            "payerList": [
+                {
+                    "person": {
+                        "id": 2,
+                        "name": "Van",
+                        "individualBalance": {
+                            "Khoa": 7000.000
+                        },
+                        "balanceConverted": {
+                            "Khoa": 47.337
+                        }
+                    },
+                    "amount": 3000.00
+                }
+            ],
+            "splitsList": [
+                {
+                    "person": {
+                        "id": 1,
+                        "name": "Henry",
+                        "individualBalance": {
+                            "Van": 1000.00,
+                            "Khoa": 5000.00
+                        },
+                        "balanceConverted": {
+                            "Van": 6.725,
+                            "Khoa": 33.887
+                        }
+                    },
+                    "amount": 1000.00
+                },
+                {
+                    "person": {
+                        "id": 2,
+                        "name": "Van",
+                        "individualBalance": {
+                            "Khoa": 7000.000
+                        },
+                        "balanceConverted": {
+                            "Khoa": 47.337
+                        }
+                    },
+                    "amount": 1000.00
+                },
+                {
+                    "person": {
+                        "id": 3,
+                        "name": "Khoa",
+                        "individualBalance": {
+                            "Van": 1000.00
+                        },
+                        "balanceConverted": {
+                            "Van": 6.725
+                        }
+                    },
+                    "amount": 1000.00
+                }
+            ],
             "splitsMap": {
                 "Henry": 1000.00,
                 "Van": 1000.00,
@@ -118,7 +250,6 @@
                 "Van": -13.450,
                 "Khoa": 6.725
             },
-            "currencyType": null,
             "payerMap": {
                 "Van": 3000.00
             }
@@ -128,6 +259,7 @@
             "title": "Uniqlo",
             "amount": 10000.00,
             "payBack": false,
+            "currencyCode": null,
             "currencyRate": 147.55,
             "date": "2025-06-23",
             "participants": [
@@ -164,6 +296,51 @@
                     }
                 }
             ],
+            "payerList": [
+                {
+                    "person": {
+                        "id": 3,
+                        "name": "Khoa",
+                        "individualBalance": {
+                            "Van": 1000.00
+                        },
+                        "balanceConverted": {
+                            "Van": 6.725
+                        }
+                    },
+                    "amount": 10000.00
+                }
+            ],
+            "splitsList": [
+                {
+                    "person": {
+                        "id": 1,
+                        "name": "Henry",
+                        "individualBalance": {
+                            "Van": 1000.00,
+                            "Khoa": 5000.00
+                        },
+                        "balanceConverted": {
+                            "Van": 6.725,
+                            "Khoa": 33.887
+                        }
+                    },
+                    "amount": 5000.00
+                },
+                {
+                    "person": {
+                        "id": 2,
+                        "name": "Van",
+                        "individualBalance": {
+                            "Khoa": 7000.000
+                        },
+                        "balanceConverted": {
+                            "Khoa": 47.337
+                        }
+                    },
+                    "amount": 5000.00
+                }
+            ],
             "splitsMap": {
                 "Henry": 5000.00,
                 "Van": 5000.00
@@ -178,13 +355,11 @@
                 "Van": 33.887,
                 "Khoa": -67.774
             },
-            "currencyType": null,
             "payerMap": {
                 "Khoa": 10000.00
             }
         }
     ],
-    "tripName": "Japan 2025",
     "participantsList": [
         {
             "id": 1,
@@ -218,5 +393,6 @@
                 "Van": 6.725
             }
         }
-    ]
+    ],
+    "tripName": "Japan 2025"
 }

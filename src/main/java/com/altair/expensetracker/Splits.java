@@ -26,4 +26,12 @@ public class Splits {
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
+
+    @Override
+    public String toString() {
+        return "Splits{" +
+                "person=" + person +
+                ", amount=" + amount +
+                '}';
+    }
 }

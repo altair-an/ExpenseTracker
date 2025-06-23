@@ -28,4 +28,12 @@ public class Payer {
         this.amount = amount;
     }
 
+    @Override
+    public String toString() {
+        return "Payer{" +
+                "person=" + person +
+                ", amount=" + amount +
+                '}';
+    }
+
 }
