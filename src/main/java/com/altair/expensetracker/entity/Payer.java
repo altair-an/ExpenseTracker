@@ -1,14 +1,28 @@
-package com.altair.expensetracker;
+package com.altair.expensetracker.entity;
+
 import java.math.BigDecimal;
+import jakarta.persistence.*;
 
-public class Splits {
-    
+@Entity
+@Table(name = "payer")
+public class Payer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
     private Person person;
-    private BigDecimal amount; // Amount owed by the person
+    private BigDecimal amount; 
+    @ManyToOne
+    private Expense expense; 
 
-    public Splits(Person person, BigDecimal amount) {
+    public Payer() {}
+    
+    public Payer(Person person, BigDecimal amount, Expense expense) {
         this.person = person;
         this.amount = amount;
+        this.expense = expense;
     }
 
     public Person getPerson() {
@@ -29,9 +43,10 @@ public class Splits {
 
     @Override
     public String toString() {
-        return "Splits{" +
+        return "Payer{" +
                 "person=" + person +
                 ", amount=" + amount +
                 '}';
     }
+
 }

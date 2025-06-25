@@ -1,4 +1,4 @@
-package com.altair.expensetracker;
+package com.altair.expensetracker.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -1,23 +1,34 @@
-package com.altair.expensetracker;
+package com.altair.expensetracker.entity;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "expense")
 public class Expense {
-    private static int counter;
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String title;
     private BigDecimal amount;
     private boolean payBack = false;  //indicates if the expense is a payback or not
     private String currencyCode;  
     private BigDecimal currencyRate;
     private String date; 
+    @ManyToMany
     private List<Person> participants; 
+    @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payer> payerList = new ArrayList<>();
+    @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Splits> splitsList = new ArrayList<>();
+    @Transient
     private Map<Person, BigDecimal> payersMap = new HashMap<>();  //keep track of who paid the expense
+    @Transient
     private Map<Person, BigDecimal> splitsMap = new HashMap<>(); //keep track of who's responsible for x amount
+    @Transient
     private Map<Person, BigDecimal> expenseBalance = new HashMap<>(); //payersMap minus splitsMap
+    @Transient
     private Map<Person, BigDecimal> expenseBalanceConverted = new HashMap<>(); //converted to other currency
 
     public Expense(){}
@@ -25,12 +36,10 @@ public class Expense {
         this.title = title;
         this.amount = amount;
         this.date = date;
-        counter++;
-        id = counter;
     }
 
     //expenseId getter
-    public int getID(){
+    public Long getID(){
         return id;
     }
 
@@ -114,7 +123,7 @@ public class Expense {
     Parameters:  the payer and the amount paid
     */
     public void setPayer(Person payer, BigDecimal paidAmount){
-        payerList.add(new Payer(payer, paidAmount));
+        payerList.add(new Payer(payer, paidAmount, this));
     }
 
     public List<Payer> getPayerList(){
@@ -131,7 +140,7 @@ public class Expense {
     Parameters: the person and their split amount that they are responsible for.
     */
     public void setSplit(Person person, BigDecimal splitAmount){
-        splitsList.add(new Splits(person, splitAmount));
+        splitsList.add(new Splits(person, splitAmount, this));
     }
 
     public List<Splits> getSplitsList(){
@@ -224,7 +233,7 @@ public class Expense {
                         BigDecimal convertedValue = debtValue.divide(currencyRate, 3, RoundingMode.HALF_UP); 
                         borrowPerson.addBalanceConverted(lenderPerson, convertedValue);
 
-                        borrowedAmount.subtract(debtValue);  // Settling the the debt this round. Loop will continue until borrowedAmount is 0 or less.
+                        borrowedAmount = borrowedAmount.subtract(debtValue);  // Settling the the debt this round. Loop will continue until borrowedAmount is 0 or less.
                         expenseBalance.put(lenderPerson, lentAmount.add(debtValue)); // Update the expenseBalance for lenderPerson to reflect settled debt
                     }
                 }

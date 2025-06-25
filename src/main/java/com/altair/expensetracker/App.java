@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.altair.expensetracker.entity.Expense;
+import com.altair.expensetracker.entity.Person;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 

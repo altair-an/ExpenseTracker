@@ -1,4 +1,4 @@
-package com.altair.expensetracker;
+package com.altair.expensetracker.entity;
 import java.time.LocalDate;
 
 public class ExchangeRate {

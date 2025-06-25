@@ -3,6 +3,10 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.altair.expensetracker.entity.Expense;
+import com.altair.expensetracker.entity.Person;
+import com.altair.expensetracker.entity.Trip;
+import com.altair.expensetracker.util.ExchangeRateFetcher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.*;
 import org.junit.jupiter.api.Test;
