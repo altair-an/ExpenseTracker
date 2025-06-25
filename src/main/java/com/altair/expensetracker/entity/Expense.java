@@ -1,11 +1,23 @@
 package com.altair.expensetracker.entity;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "expense")
@@ -24,7 +36,7 @@ public class Expense {
     @JsonBackReference
     private Trip trip;
     @ManyToMany
-    private List<Person> participants; 
+    private List<Person> expenseParticipants; 
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payer> payerList = new ArrayList<>();
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -34,7 +46,7 @@ public class Expense {
     @Transient
     private Map<Person, BigDecimal> splitsMap = new HashMap<>(); //keep track of who's responsible for x amount
     @Transient
-    private Map<Person, BigDecimal> expenseBalance = new HashMap<>(); //payersMap minus splitsMap
+    private Map<Person, BigDecimal> expenseBalance = new HashMap<>(); // your split - your paid amount = your balance for this expense, positive means you owe money, negative means you are owed/down money
     @Transient
     private Map<Person, BigDecimal> expenseBalanceConverted = new HashMap<>(); //converted to other currency
 
@@ -116,20 +128,20 @@ public class Expense {
 
     // Participants setter and getter
     public void setParticipants(List<Person> participants){ // Takes in a list of participants
-        this.participants = participants;
+        this.expenseParticipants = participants;
     }
 
     public void setParticipant(Person participant){ // Takes in a single participant
-        if (participants == null) {
-            participants = new ArrayList<>();
+        if (expenseParticipants == null) {
+            expenseParticipants = new ArrayList<>();
         }
-        if (!participants.contains(participant)) {
-            participants.add(participant); 
+        if (!expenseParticipants.contains(participant)) {
+            expenseParticipants.add(participant); 
         }
     }
 
-    public List<Person> getParticipants(){
-        return participants;
+    public List<Person> getExpenseParticipants(){
+        return expenseParticipants;
     }
     
     /*
@@ -182,13 +194,13 @@ public class Expense {
     */
     public void evenSplit(){
         BigDecimal even = amount.divide(
-            BigDecimal.valueOf(participants.size()),
+            BigDecimal.valueOf(expenseParticipants.size()),
       3, 
             RoundingMode.HALF_UP 
         );
 
-        for (int i = 0; i < participants.size(); i++){
-            setSplit(participants.get(i), even); 
+        for (int i = 0; i < expenseParticipants.size(); i++){
+            setSplit(expenseParticipants.get(i), even); 
         }
     }
 
@@ -215,10 +227,10 @@ public class Expense {
     */ 
     public void calculateExpense() {
         updateMaps();
-        for (Person person : participants) {
+        for (Person person : expenseParticipants) {
             BigDecimal paidAmount = payersMap.getOrDefault(person, BigDecimal.ZERO);
             BigDecimal splitAmount = splitsMap.getOrDefault(person, BigDecimal.ZERO);
-            BigDecimal diffAmount = splitAmount.subtract(paidAmount);
+            BigDecimal diffAmount = splitAmount.subtract(paidAmount); // your split - your paid amount = amount you're still responsible for, positive means you owe money, negative means you are owed/down money
     
             expenseBalance.put(person, diffAmount);
             BigDecimal newValue = diffAmount.divide(currencyRate, 3, RoundingMode.HALF_UP);

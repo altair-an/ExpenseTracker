@@ -19,6 +19,11 @@ public class TripController {
         return tripService.getAllTrips();
     }
 
+    @GetMapping("/{id}")
+    public Trip getTripById(@PathVariable Long id) {
+        return tripService.getTripById(id);
+    }
+
     @PostMapping
     public Trip createTrip(@RequestBody Trip trip) {
         return tripService.createTrip(trip);

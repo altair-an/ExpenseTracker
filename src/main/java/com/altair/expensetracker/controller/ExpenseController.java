@@ -19,6 +19,11 @@ public class ExpenseController {
         return expenseService.getAllExpenses();
     }
 
+    @GetMapping("/{id}")
+    public Expense getExpenseById(@PathVariable Long id) {
+        return expenseService.getExpenseById(id);
+    }
+
     @PostMapping
     public Expense createExpense(@RequestBody Expense expense) {
         return expenseService.createExpense(expense);

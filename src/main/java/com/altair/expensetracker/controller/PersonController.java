@@ -24,6 +24,11 @@ public class PersonController {
         return personService.getAllPersons();
     }
 
+    @GetMapping("/{id}")
+    public Person getPersonById(@PathVariable Long id) {
+        return personService.getPersonById(id);
+    }
+
     // Command below in powershell to test this endpoint:
     // Invoke-RestMethod -Uri "http://localhost:8080/api/persons" -Method Post -Headers @{"Content-Type"="application/json"} -Body '{"name":"Alice"}'
     @PostMapping
