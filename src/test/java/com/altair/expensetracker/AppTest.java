@@ -99,12 +99,12 @@ public class AppTest {
                               participant.getBalanceConverted());
         }
         // Print out the total balance of all expenses
-        System.out.println("\n~~~~~~Printing total balance of all expenses/simplified debt~~~~~~");
-        Map<Person, BigDecimal> totalBalance = trip.calculateTotalExpense();
-        System.out.println("YEN " + totalBalance);
-        Map<Person, BigDecimal> totalBalanceConverted = trip.calculateTotalExpenseConverted();
-        System.out.println("USD " + totalBalanceConverted);
-        System.out.println();
+        // System.out.println("\n~~~~~~Printing total balance of all expenses/simplified debt~~~~~~");
+        // Map<Person, BigDecimal> totalBalance = trip.calculateTotalExpense();
+        // System.out.println("YEN " + totalBalance);
+        // Map<Person, BigDecimal> totalBalanceConverted = trip.calculateTotalExpenseConverted();
+        // System.out.println("USD " + totalBalanceConverted);
+        // System.out.println();
 
         // Testing to see if payers and splits are correctly set
         System.out.println("~~~~~~Printing payers and splits for each expense~~~~~~");
@@ -211,12 +211,12 @@ public class AppTest {
                               participant.getBalanceConverted());
         }
         // Print out the total balance of all expenses
-        System.out.println("\n~~~~~~Printing total balance of all expenses/simplified debt~~~~~~");
-        Map<Person, BigDecimal> totalBalance = trip.calculateTotalExpense();
-        System.out.println("YEN " + totalBalance);
-        Map<Person, BigDecimal> totalBalanceConverted = trip.calculateTotalExpenseConverted();
-        System.out.println("USD " + totalBalanceConverted);
-        System.out.println();
+        // System.out.println("\n~~~~~~Printing total balance of all expenses/simplified debt~~~~~~");
+        // Map<Person, BigDecimal> totalBalance = trip.calculateTotalExpense();
+        // System.out.println("YEN " + totalBalance);
+        // Map<Person, BigDecimal> totalBalanceConverted = trip.calculateTotalExpense();
+        // System.out.println("USD " + totalBalanceConverted);
+        // System.out.println();
 
         // Testing to see if payers and splits are correctly set
         System.out.println("~~~~~~Printing payers and splits for each expense~~~~~~");

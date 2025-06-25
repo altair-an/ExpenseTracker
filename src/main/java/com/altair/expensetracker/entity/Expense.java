@@ -2,6 +2,9 @@ package com.altair.expensetracker.entity;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -16,6 +19,10 @@ public class Expense {
     private String currencyCode;  
     private BigDecimal currencyRate;
     private String date; 
+
+    @ManyToOne
+    @JsonBackReference
+    private Trip trip;
     @ManyToMany
     private List<Person> participants; 
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -41,6 +48,14 @@ public class Expense {
     //expenseId getter
     public Long getID(){
         return id;
+    }
+
+    public void setTrip(Trip trip) {
+        this.trip = trip;
+    }
+
+    public Trip getTrip() {
+        return trip;
     }
 
     //title setter and getter
@@ -187,6 +202,11 @@ public class Expense {
         for (Splits split : splitsList) {
             splitsMap.merge(split.getPerson(), split.getAmount(), BigDecimal::add);
         }
+    }
+
+    public void calculateAll() {
+        calculateExpense(); // Calculate the expense balance for each participant
+        calculateIndividualBalances(); // Calculate individual balances based on the expense balance
     }
 
     /*

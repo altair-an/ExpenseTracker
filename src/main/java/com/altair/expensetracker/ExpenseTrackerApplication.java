@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import com.altair.expensetracker.entity.*;
 import com.altair.expensetracker.repository.ExpenseRepository;
 import com.altair.expensetracker.repository.PersonRepository;
+import com.altair.expensetracker.repository.TripRepository;
 
 @SpringBootApplication
 public class ExpenseTrackerApplication {
@@ -25,9 +26,12 @@ public class ExpenseTrackerApplication {
         SpringApplication.run(ExpenseTrackerApplication.class, args);
     }
 
+
     @Bean
-    CommandLineRunner runner(PersonRepository personRepository) {
+    CommandLineRunner runner(PersonRepository personRepository, TripRepository tripRepository) {
         return args -> {
+            Trip trip = new Trip("Japan");
+
             personRepository.save(new Person("Henry"));
             personRepository.save(new Person("Van"));
             personRepository.save(new Person("Khoa"));
@@ -45,6 +49,10 @@ public class ExpenseTrackerApplication {
             
             expense1.calculateExpense();
             expense1.calculateIndividualBalances();
+            trip.addExpense(expense1);
+            trip.addParticipants(participants);
+            expense1.setTrip(trip); 
+            tripRepository.save(trip);
 
             expenseRepository.save(expense1);
         };
