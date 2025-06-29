@@ -43,7 +43,7 @@ public class DataLoader {
             expense.setPayer(khoa, new BigDecimal("4000.00"));
             expense.setPayer(henry, new BigDecimal("2000.00"));
             expense.evenSplit();
-            expense.setCurrencyRate(new BigDecimal("148.7")); 
+            expense.setExchangeRate(new BigDecimal("148.7")); 
             expense.setTrip(trip);
             trip.addExpense(expense);
 
@@ -58,7 +58,7 @@ public class DataLoader {
             expense2.setPayer(van, new BigDecimal("3000.00")); 
 
             expense2.evenSplit();
-            expense2.setCurrencyRate(new BigDecimal("148.7")); 
+            expense2.setExchangeRate(new BigDecimal("148.7")); 
             expense2.setTrip(trip);
             trip.addExpense(expense2);
 

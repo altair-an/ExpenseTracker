@@ -21,31 +21,24 @@ public class Person {
     public Person(String name){
         this.name = name;
     }
+    
+    // Getters and Setters
+    public Long getID() { return id; }
 
-    public Long getID(){
-        return id;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName(){
-        return name;
-    }
+    public Map<Person, BigDecimal> getIndividualBalance(){ return individualBalance; }
+    public Map<Person, BigDecimal> getBalanceConverted(){ return balanceConverted; }
 
     // Used in Expense's calculateIndividualBalance method
     public void addIndividualBalance(Person person, BigDecimal amount){
         individualBalance.merge(person, amount, BigDecimal::add);
     }
 
-    public Map<Person, BigDecimal> getIndividualBalance(){
-        return individualBalance;
-    }
-
     // Same but for converted amount
     public void addBalanceConverted(Person person, BigDecimal amount){
         balanceConverted.merge(person, amount, BigDecimal::add);
-    }
-    
-    public Map<Person, BigDecimal> getBalanceConverted(){
-        return balanceConverted;
     }
 
     //For debugging while testing the expense class printing out results
