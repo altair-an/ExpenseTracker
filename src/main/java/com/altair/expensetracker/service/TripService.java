@@ -31,7 +31,15 @@ public class TripService {
         return trips;
     }
     public Trip getTripById(Long id) {
-        return tripRepository.findById(id).orElse(null);
+        Trip trip = tripRepository.findById(id).orElse(null);
+        if (trip != null) {
+            List<Expense> expenses = trip.getExpenseList();
+            for (Expense expense : expenses) {
+                expense.calculateAll();
+            }
+            trip.calculateTotalExpense();
+        }
+        return trip;
     }
 
     public Trip createTrip(Trip trip) {

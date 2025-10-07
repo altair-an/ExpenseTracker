@@ -19,7 +19,7 @@ public class Splits {
     private BigDecimal amount; // Amount responsible by the person for an expense
     @ManyToOne
     @JsonBackReference
-    @JsonIgnore 
+    //@JsonIgnore 
     private Expense expense;
 
     public Splits() {}

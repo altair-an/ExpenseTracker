@@ -24,11 +24,11 @@ public class Expense {
     private List<Person> expenseParticipants; 
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    @JsonIgnore 
+    //@JsonIgnore 
     private List<Payer> payerList = new ArrayList<>();
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    @JsonIgnore 
+    //@JsonIgnore 
     private List<Splits> splitsList = new ArrayList<>();
     @Transient
     private Map<Person, BigDecimal> payersMap = new HashMap<>();  //keep track of who paid the expense
@@ -48,8 +48,8 @@ public class Expense {
 
     // Getters and Setters
     public Long getID() { return id; } 
-    public void setTrip(Trip trip) { this.trip = trip; }
 
+    public void setTrip(Trip trip) { this.trip = trip; }
     public Trip getTrip() { return trip; }
 
     public void setTitle(String title) { this.title = title; }
@@ -91,6 +91,20 @@ public class Expense {
 
     public Map<Person, BigDecimal> getExpenseBalance() { return expenseBalance; }
     public Map<Person, BigDecimal> getExpenseBalanceConverted() { return expenseBalanceConverted; }
+
+
+
+
+
+
+    //  BELOW MOVED TO SERVICE LAYER BUT KEPT FOR REFERENCE
+
+
+
+
+
+
+
 
     /*
     Split the bill amount evenly between all participants. The for loop will iterate through 

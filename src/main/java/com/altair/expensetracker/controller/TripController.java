@@ -38,8 +38,8 @@ public class TripController {
         return tripService.createTrip(trip);
     }
 
-    // Nested Trip-Expense
-    @PostMapping("/{tripId}/expenses")
+    // Creating an expense for a specific trip at the endpoint /api/trips/{tripId}/expenses
+    @PostMapping(value = "/{tripId}/expenses", consumes = "application/json")
     public ResponseEntity<Expense> createExpenseForTrip(@PathVariable Long tripId, @RequestBody Expense expense) {
         try {
             Expense created = expenseService.createExpenseForTrip(tripId, expense);
@@ -50,7 +50,7 @@ public class TripController {
     }
     
     @GetMapping("/{tripId}/expenses")
-    public ResponseEntity<List<Expense>> getExpensesForTrip(@PathVariable Long tripId) {
+    public ResponseEntity<List<Expense>> getAllExpensesForTrip(@PathVariable Long tripId) {
         try {
             List<Expense> expenses = expenseService.getExpensesForTrip(tripId);
             return ResponseEntity.ok(expenses);
@@ -60,7 +60,7 @@ public class TripController {
     }
 
     @GetMapping("/{tripId}/expenses/{expenseId}")
-    public ResponseEntity<Expense> getExpenseInTrip(@PathVariable Long tripId, @PathVariable Long expenseId) {
+    public ResponseEntity<Expense> getExpenseForTrip(@PathVariable Long tripId, @PathVariable Long expenseId) {
         try {
             Expense expense = expenseService.getExpenseInTrip(tripId, expenseId);
             return ResponseEntity.ok(expense);

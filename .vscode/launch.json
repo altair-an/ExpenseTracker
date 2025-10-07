@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ExpenseTrackerApplication",
+            "request": "launch",
+            "mainClass": "com.altair.expensetracker.ExpenseTrackerApplication",
+            "projectName": "expensetracker"
+        },
+        {
+            "type": "java",
             "name": "AppTest",
             "request": "launch",
             "mainClass": "com.altair.expensetracker.AppTest",

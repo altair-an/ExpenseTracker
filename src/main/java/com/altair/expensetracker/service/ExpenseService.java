@@ -40,6 +40,7 @@ public class ExpenseService {
     }
 
     public Expense createExpense(Expense expense) {
+        calculateAll(expense);
         return expenseRepository.save(expense);
     }
 
@@ -97,8 +98,8 @@ public class ExpenseService {
         Trip trip = tripRepository.findById(tripId)
             .orElseThrow(() -> new EntityNotFoundException("Trip not found"));
         
-        expense.setTrip(trip);
-        
+        expense.setTrip(trip);    
+        calculateAll(expense);
         return expenseRepository.save(expense);
     }
     
@@ -126,7 +127,8 @@ public class ExpenseService {
             throw new EntityNotFoundException("Expense does not belong to this trip");
         }
 
-        expense.calculateExpense();
+        //expense.calculateExpense();
+        calculateAll(expense);
         return expense;
     }
 
@@ -134,8 +136,10 @@ public class ExpenseService {
 
 
     ////// CALCULATION LOGIC //////
+    
+    // Update payerMap and splitsMap transient/derived data from the lists
     private void updateMaps(Expense expense) {
-        expense.getPayerMap().clear();;
+        expense.getPayerMap().clear();
         expense.getSplitsMap().clear();
         for (Payer payer : expense.getPayerList()) {
             expense.getPayerMap().merge(payer.getPerson(), payer.getAmount(), BigDecimal::add);
@@ -145,7 +149,9 @@ public class ExpenseService {
         }
     }
 
+    // Calculate expenseBalance and expenseBalanceConverted from payerMap and splitsMap
     private void calculateExpenseBalance(Expense expense) {
+        // Getting references to data inside Expense object
         Map<Person, BigDecimal> payerMap = expense.getPayerMap();
         Map<Person, BigDecimal> splitsMap = expense.getSplitsMap();
         Map<Person, BigDecimal> expenseBalance = expense.getExpenseBalance();
@@ -199,6 +205,7 @@ public class ExpenseService {
         calculateExpenseBalance(expense); // Recalculating the expense balance HashMap back to original values
     }
 
+    // Calculate all derived fields in one go
     public void calculateAll(Expense expense) {
         calculateExpenseBalance(expense);
         calculateIndividualBalances(expense);

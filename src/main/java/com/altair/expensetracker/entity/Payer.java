@@ -20,7 +20,7 @@ public class Payer {
     private BigDecimal amount; 
     @ManyToOne
     @JsonBackReference
-    @JsonIgnore 
+    //@JsonIgnore 
     private Expense expense; 
 
     public Payer() {}

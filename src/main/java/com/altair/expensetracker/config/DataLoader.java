@@ -63,7 +63,19 @@ public class DataLoader {
             trip.addExpense(expense2);
 
 
-
+            // Expense 3 - not even split
+            Expense expense3 = new Expense();
+            expense3.setParticipants(participants);
+            expense3.setTitle("Starbucks");
+            expense3.setAmount(new BigDecimal("1500.00"));
+            expense3.setDate(LocalDate.now().toString());
+            expense3.setPayer(henry, new BigDecimal("1500.00"));
+            expense3.setSplit(henry, new BigDecimal("500.00"));
+            expense3.setSplit(van, new BigDecimal("700.00"));
+            expense3.setSplit(khoa, new BigDecimal("300.00"));
+            expense3.setExchangeRate(new BigDecimal("148.7"));
+            expense3.setTrip(trip);
+            trip.addExpense(expense3);
 
 
             tripRepository.save(trip);

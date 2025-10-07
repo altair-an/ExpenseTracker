@@ -10,9 +10,6 @@ import java.util.List;
 @Service
 public class PersonService {
 
-    // This class will handle the business logic related to Person entities.
-    // It will interact with the PersonRepository to perform CRUD operations.
-
     private final PersonRepository personRepository;
     private final ExpenseRepository expenseRepository;
     public PersonService(PersonRepository personRepository, ExpenseRepository expenseRepository) {

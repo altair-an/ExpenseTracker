@@ -1,0 +1,45 @@
+### Get all trips
+GET http://localhost:8080/api/trips
+
+### Get a specific trip by ID
+GET http://localhost:8080/api/trips/1
+
+### Create a new trip
+POST http://localhost:8080/api/trips
+Content-Type: application/json
+
+{
+  "name": "New Trip"
+}
+
+### Get all expenses for a trip
+GET http://localhost:8080/api/trips/1/expenses/3
+
+
+### Delete an expense by ID
+DELETE http://localhost:8080/api/expenses/3
+
+### Create an expense for a trip
+POST http://localhost:8080/api/trips/1/expenses
+Content-Type: application/json
+
+{
+  "title": "Lunch",
+  "amount": 3000,
+  "date": "2025-10-06",
+  "exchangeRate": 148,
+  "expenseParticipants": [
+    { "id": 1, "name": "Henry" },
+    { "id": 2, "name": "Van" },
+    { "id": 3, "name": "Khoa" }
+  ],
+  "payerList": [
+    { "person": { "id": 1, "name": "Henry" }, "amount": 2000 },
+    { "person": { "id": 2, "name": "Van" }, "amount": 1000 }
+  ],
+  "splitsList": [
+    { "person": { "id": 1, "name": "Henry" }, "amount": 1000 },
+    { "person": { "id": 2, "name": "Van" }, "amount": 1000 },
+    { "person": { "id": 3, "name": "Khoa" }, "amount": 1000 }
+  ]
+}
