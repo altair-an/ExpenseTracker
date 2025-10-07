@@ -4,6 +4,8 @@ import com.altair.expensetracker.entity.Expense;
 import com.altair.expensetracker.entity.Trip;
 import com.altair.expensetracker.service.ExpenseService;
 import com.altair.expensetracker.service.TripService;
+import com.altair.expensetracker.dto.ExpenseCreateDTO;
+import com.altair.expensetracker.dto.ExpenseDTO;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -39,30 +41,35 @@ public class TripController {
     }
 
     // Creating an expense for a specific trip at the endpoint /api/trips/{tripId}/expenses
+    // Accepts ExpenseCreateDTO and returns ExpenseDTO
     @PostMapping(value = "/{tripId}/expenses", consumes = "application/json")
-    public ResponseEntity<Expense> createExpenseForTrip(@PathVariable Long tripId, @RequestBody Expense expense) {
+    public ResponseEntity<ExpenseDTO> createExpenseForTrip(@PathVariable Long tripId, @RequestBody ExpenseCreateDTO expenseCreateDTO) {
         try {
-            Expense created = expenseService.createExpenseForTrip(tripId, expense);
+            ExpenseDTO created = expenseService.createExpenseForTrip(tripId, expenseCreateDTO); // Expense service handles conversion and saving
             return ResponseEntity.status(201).body(created);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
     
+    // Getting all expenses for a specific trip at the endpoint /api/trips/{tripId}/expenses
+    // Returns ExpenseDTO objects
     @GetMapping("/{tripId}/expenses")
-    public ResponseEntity<List<Expense>> getAllExpensesForTrip(@PathVariable Long tripId) {
+    public ResponseEntity<List<ExpenseDTO>> getAllExpensesForTrip(@PathVariable Long tripId) {
         try {
-            List<Expense> expenses = expenseService.getExpensesForTrip(tripId);
+            List<ExpenseDTO> expenses = expenseService.getExpensesForTrip(tripId); // Expense service fetches and converts
             return ResponseEntity.ok(expenses);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
+    // Getting a specific expense for a specific trip at the endpoint /api/trips/{tripId}/expenses/{expenseId}
+    // Returns ExpenseDTO object
     @GetMapping("/{tripId}/expenses/{expenseId}")
-    public ResponseEntity<Expense> getExpenseForTrip(@PathVariable Long tripId, @PathVariable Long expenseId) {
+    public ResponseEntity<ExpenseDTO> getExpenseForTrip(@PathVariable Long tripId, @PathVariable Long expenseId) {
         try {
-            Expense expense = expenseService.getExpenseInTrip(tripId, expenseId);
+            ExpenseDTO expense = expenseService.getExpenseInTrip(tripId, expenseId); // Expense service fetches and converts
             return ResponseEntity.ok(expense);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();

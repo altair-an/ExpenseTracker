@@ -1,11 +1,13 @@
 package com.altair.expensetracker.service;
 
 import com.altair.expensetracker.repository.*;
+import com.altair.expensetracker.entity.*;
+import com.altair.expensetracker.dto.ExpenseCreateDTO;
+import com.altair.expensetracker.dto.ExpenseCreateDTO.PersonDTO;
+import com.altair.expensetracker.dto.ExpenseDTO;
 
 import jakarta.persistence.EntityNotFoundException;
-
 import org.springframework.stereotype.Service;
-import com.altair.expensetracker.entity.*;
 import java.math.*;
 import java.util.*;
 
@@ -13,49 +15,57 @@ import java.util.*;
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final TripRepository tripRepository;
+    private final PersonRepository personRepository;
 
-    public ExpenseService(ExpenseRepository expenseRepository, TripRepository tripRepository) {
+    public ExpenseService(ExpenseRepository expenseRepository, TripRepository tripRepository, PersonRepository personRepository) {
         this.expenseRepository = expenseRepository;
         this.tripRepository = tripRepository;
+        this.personRepository = personRepository;
     }
 
-    public List<Expense> getAllExpenses() {
+    // Retrieve all expenses regardless of trip association
+    public List<ExpenseDTO> getAllExpenses() {
         List<Expense> expenses = expenseRepository.findAll();
-        // recalculate derived fields
+        List<ExpenseDTO> expenseDTOs = new ArrayList<>();
         for (Expense expense : expenses) {
-            calculateAll(expense);
+            calculateAll(expense); // Recalculate derived fields
+            expenseDTOs.add(convertToDTO(expense));
         }
-        return expenses;
+        return expenseDTOs;
     }
 
-    public Expense getExpenseById(Long id) {
+    // Retrieve a single expense by ID
+    public ExpenseDTO getExpenseById(Long id) {
         Optional<Expense> optionalExpense = expenseRepository.findById(id);
         if (optionalExpense.isPresent()) {
             Expense expense = optionalExpense.get();
             calculateAll(expense); // Recalculate derived fields
-            return expense;
+            return convertToDTO(expense);
         } else {
             throw new NoSuchElementException("Expense not found with id: " + id);
         }
     }
 
-    public Expense createExpense(Expense expense) {
+    // Create a new expense
+    public ExpenseDTO createExpense(Expense expense) {
         calculateAll(expense);
-        return expenseRepository.save(expense);
+        return convertToDTO(expenseRepository.save(expense));
     }
 
+    // Create a new expense with even splits
     public Expense createExpenseWithEvenSplit(Expense expense) {
         generateEvenSplits(expense);
         calculateAll(expense);
         return expenseRepository.save(expense);
     }
 
+    // Update an existing expense
     public Expense updateExpense(Long id, Expense updatedExpense) {
         Optional<Expense> optionalExpense = expenseRepository.findById(id);
         if (optionalExpense.isPresent()) {
             Expense existingExpense = optionalExpense.get();
-            
-            // Update 
+
+            // Update fields
             existingExpense.setAmount(updatedExpense.getAmount());
             existingExpense.setTitle(updatedExpense.getTitle());
             existingExpense.setDate(updatedExpense.getDate());
@@ -74,10 +84,12 @@ public class ExpenseService {
         }
     }
 
+    // Delete an expense by ID
     public void deleteExpense(Long id) {
         expenseRepository.deleteById(id);
     }
 
+    // Helper method for even splits
     private void generateEvenSplits(Expense expense) {
         List<Person> people = expense.getExpenseParticipants();
         BigDecimal amountPerPerson = expense.getAmount().divide(new BigDecimal(people.size()), 
@@ -94,45 +106,124 @@ public class ExpenseService {
     }
 
     // For nested Trip-Expense creation
-    public Expense createExpenseForTrip(Long tripId, Expense expense) {
+    public ExpenseDTO createExpenseForTrip(Long tripId, ExpenseCreateDTO expenseCreateDTO) {
         Trip trip = tripRepository.findById(tripId)
             .orElseThrow(() -> new EntityNotFoundException("Trip not found"));
         
+        Expense expense = convertCreateDTOToEntity(expenseCreateDTO);
         expense.setTrip(trip);    
         calculateAll(expense);
-        return expenseRepository.save(expense);
+        Expense saved = expenseRepository.save(expense);
+        return convertToDTO(saved);
     }
-    
-    public List<Expense> getExpensesForTrip(Long tripId) {
+
+    // Get all expenses for a specific trip
+    public List<ExpenseDTO> getExpensesForTrip(Long tripId) {
         Trip trip = tripRepository.findById(tripId)
             .orElseThrow(() -> new EntityNotFoundException("Trip not found"));
         List<Expense> expenses = trip.getExpenseList();
+        List<ExpenseDTO> expenseDTOs = new ArrayList<>();
         for (Expense expense : expenses) {
             calculateAll(expense);
+            expenseDTOs.add(convertToDTO(expense));
         }
-        return expenses;
+        return expenseDTOs;
     }
 
-    public Expense getExpenseInTrip(Long tripId, Long expenseId) {
-        // Find trip
-        Trip trip = tripRepository.findById(tripId)
+    // Get a specific expense within a trip
+    public ExpenseDTO getExpenseInTrip(Long tripId, Long expenseId) {
+        // Find trip (to throw if not found)
+        tripRepository.findById(tripId)
             .orElseThrow(() -> new EntityNotFoundException("Trip not found"));
-        
-        // Find expense 
-        Expense expense = expenseRepository.findById(expenseId)
-            .orElseThrow(() -> new EntityNotFoundException("Expense not found"));
-        
-        // Check if expense belongs to this trip
-        if (!expense.getTrip().getId().equals(tripId)) {
+
+        ExpenseDTO dto = getExpenseById(expenseId);
+
+        if (dto.getTripID() == null || !dto.getTripID().equals(tripId.toString())) {
             throw new EntityNotFoundException("Expense does not belong to this trip");
         }
-
-        //expense.calculateExpense();
-        calculateAll(expense);
-        return expense;
+        return dto;
     }
 
+    ////// DTO CONVERSION LOGIC //////
+    
+    // DTO : Converting Expense entity to ExpenseDTO for GET requests
+    public ExpenseDTO convertToDTO(Expense expense) {
+        ExpenseDTO dto = new ExpenseDTO();
+        dto.setId(expense.getID());
+        dto.setTitle(expense.getTitle());
+        dto.setAmount(expense.getAmount());
+        dto.setDate(expense.getDate());
+        dto.setCurrencyCode(expense.getCurrencyCode());
+        dto.setExchangeRate(expense.getExchangeRate());
+        dto.setTripID(expense.getTrip() != null ? expense.getTrip().getId().toString() : null);
+        
+        List<String> participantNames = new ArrayList<>();
+        for (Person person : expense.getExpenseParticipants()) {
+            participantNames.add(person.getName());
+        }
+        dto.setExpenseParticipants(participantNames);
+        
+        Map<String, BigDecimal> payersMap = new HashMap<>();
+        for (Map.Entry<Person, BigDecimal> entry : expense.getPayerMap().entrySet()) {
+            payersMap.put(entry.getKey().getName(), entry.getValue());
+        }
+        dto.setPayersMap(payersMap);
+        
+        Map<String, BigDecimal> splitsMap = new HashMap<>();
+        for (Map.Entry<Person, BigDecimal> entry : expense.getSplitsMap().entrySet()) {
+            splitsMap.put(entry.getKey().getName(), entry.getValue());
+        }
+        dto.setSplitsMap(splitsMap);
+        
+        Map<String, BigDecimal> expenseBalance = new HashMap<>();
+        for (Map.Entry<Person, BigDecimal> entry : expense.getExpenseBalance().entrySet()) {
+            expenseBalance.put(entry.getKey().getName(), entry.getValue());
+        }
+        dto.setExpenseBalance(expenseBalance);
+        
+        Map<String, BigDecimal> expenseBalanceConverted = new HashMap<>();
+        for (Map.Entry<Person, BigDecimal> entry : expense.getExpenseBalanceConverted().entrySet()) {
+            expenseBalanceConverted.put(entry.getKey().getName(), entry.getValue());
+        }
+        dto.setExpenseBalanceConverted(expenseBalanceConverted);
 
+        return dto;
+    }
+
+    // DTO : Converting ExpenseCreateDTO to Expense entity for POST requests
+    public Expense convertCreateDTOToEntity(ExpenseCreateDTO dto) {
+        Expense expense = new Expense();
+        expense.setTitle(dto.getTitle());
+        expense.setAmount(dto.getAmount());
+        expense.setDate(dto.getDate());
+        expense.setExchangeRate(dto.getExchangeRate());
+        
+        // Participants
+        List<Person> participants = new ArrayList<>();
+        for (PersonDTO personDTO : dto.getExpenseParticipants()) {
+            Person person;
+            person = personRepository.findById(personDTO.getId())
+                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + personDTO.getId()));
+            participants.add(person);
+        }
+        expense.setParticipants(participants);
+
+        // Payers
+        for (ExpenseCreateDTO.PayerDTO payerDTO : dto.getPayerList()) {
+            Person person = personRepository.findById(payerDTO.getPerson().getId())
+                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + payerDTO.getPerson().getId()));
+            expense.setPayer(person, payerDTO.getAmount());
+        }
+
+        // Splits
+        for (ExpenseCreateDTO.SplitsDTO splitDTO : dto.getSplitsList()) {
+            Person person = personRepository.findById(splitDTO.getPerson().getId())
+                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + splitDTO.getPerson().getId()));
+            expense.setSplit(person, splitDTO.getAmount());
+        }
+
+        return expense;
+    }
 
 
     ////// CALCULATION LOGIC //////
@@ -210,5 +301,7 @@ public class ExpenseService {
         calculateExpenseBalance(expense);
         calculateIndividualBalances(expense);
     }
+
+
 
 }
