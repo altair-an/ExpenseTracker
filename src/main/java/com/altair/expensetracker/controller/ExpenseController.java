@@ -2,6 +2,8 @@ package com.altair.expensetracker.controller;
 
 import com.altair.expensetracker.entity.Expense;
 import com.altair.expensetracker.service.ExpenseService;
+import com.altair.expensetracker.dto.ExpenseDTO;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
@@ -17,17 +19,17 @@ public class ExpenseController {
     }
 
     @GetMapping
-    public List<Expense> getAllExpenses() {
+    public List<ExpenseDTO> getAllExpenses() {
         return expenseService.getAllExpenses();
     }
 
     @GetMapping("/{id}")
-    public Expense getExpenseById(@PathVariable Long id) {
+    public ExpenseDTO getExpenseById(@PathVariable Long id) {
         return expenseService.getExpenseById(id);
     }
 
     @PostMapping
-    public Expense createExpense(@RequestBody Expense expense) {
+    public ExpenseDTO createExpense(@RequestBody Expense expense) {
         return expenseService.createExpense(expense);
     }
 

@@ -12,12 +12,31 @@ Content-Type: application/json
   "name": "New Trip"
 }
 
+
+
+
+
 ### Get all expenses for a trip
+GET http://localhost:8080/api/trips/1/expenses
+
+### Get a specific expense by ID under a trip
 GET http://localhost:8080/api/trips/1/expenses/3
+
+### Get a specific expense by ID
+GET http://localhost:8080/api/expenses/1
+
+
+
+
+
 
 
 ### Delete an expense by ID
 DELETE http://localhost:8080/api/expenses/3
+
+
+
+
 
 ### Create an expense for a trip
 POST http://localhost:8080/api/trips/1/expenses
