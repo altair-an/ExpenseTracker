@@ -11,10 +11,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/persons")  // http://localhost:8080/api/persons    
 public class PersonController {
-    // This class will handle HTTP requests related to Person entities.
-    // It will use the PersonService to perform operations like creating, updating, deleting, and retrieving persons.
 
     private final PersonService personService;
+
     public PersonController(PersonService personService) {
         this.personService = personService;
     }

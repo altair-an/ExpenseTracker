@@ -43,7 +43,7 @@ public class DataLoader {
             expense.setPayer(khoa, new BigDecimal("4000.00"));
             expense.setPayer(henry, new BigDecimal("2000.00"));
             expense.evenSplit();
-            expense.setCurrencyRate(new BigDecimal("148.7")); 
+            expense.setExchangeRate(new BigDecimal("148.7")); 
             expense.setTrip(trip);
             trip.addExpense(expense);
 
@@ -58,12 +58,24 @@ public class DataLoader {
             expense2.setPayer(van, new BigDecimal("3000.00")); 
 
             expense2.evenSplit();
-            expense2.setCurrencyRate(new BigDecimal("148.7")); 
+            expense2.setExchangeRate(new BigDecimal("148.7")); 
             expense2.setTrip(trip);
             trip.addExpense(expense2);
 
 
-
+            // Expense 3 - not even split
+            Expense expense3 = new Expense();
+            expense3.setParticipants(participants);
+            expense3.setTitle("Starbucks");
+            expense3.setAmount(new BigDecimal("1500.00"));
+            expense3.setDate(LocalDate.now().toString());
+            expense3.setPayer(henry, new BigDecimal("1500.00"));
+            expense3.setSplit(henry, new BigDecimal("500.00"));
+            expense3.setSplit(van, new BigDecimal("700.00"));
+            expense3.setSplit(khoa, new BigDecimal("300.00"));
+            expense3.setExchangeRate(new BigDecimal("148.7"));
+            expense3.setTrip(trip);
+            trip.addExpense(expense3);
 
 
             tripRepository.save(trip);

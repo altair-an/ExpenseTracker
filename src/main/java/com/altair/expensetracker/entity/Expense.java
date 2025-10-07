@@ -1,23 +1,8 @@
 package com.altair.expensetracker.entity;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import java.math.*;
+import java.util.*;
+import com.fasterxml.jackson.annotation.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "expense")
@@ -29,7 +14,7 @@ public class Expense {
     private BigDecimal amount;
     private boolean payBack = false;  //indicates if the expense is a payback or not
     private String currencyCode;  
-    private BigDecimal currencyRate;
+    private BigDecimal exchangeRate;
     private String date; 
 
     @ManyToOne
@@ -38,15 +23,19 @@ public class Expense {
     @ManyToMany
     private List<Person> expenseParticipants; 
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    //@JsonIgnore 
     private List<Payer> payerList = new ArrayList<>();
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    //@JsonIgnore 
     private List<Splits> splitsList = new ArrayList<>();
     @Transient
     private Map<Person, BigDecimal> payersMap = new HashMap<>();  //keep track of who paid the expense
     @Transient
     private Map<Person, BigDecimal> splitsMap = new HashMap<>(); //keep track of who's responsible for x amount
     @Transient
-    private Map<Person, BigDecimal> expenseBalance = new HashMap<>(); // your split - your paid amount = your balance for this expense, positive means you owe money, negative means you are owed/down money
+    private Map<Person, BigDecimal> expenseBalance = new HashMap<>(); // your split - your paid amount = your balance for this expense (anything left you need to pay off), positive means you owe money, negative means you are owed/down money
     @Transient
     private Map<Person, BigDecimal> expenseBalanceConverted = new HashMap<>(); //converted to other currency
 
@@ -57,80 +46,31 @@ public class Expense {
         this.date = date;
     }
 
-    //expenseId getter
-    public Long getID(){
-        return id;
-    }
+    // Getters and Setters
+    public Long getID() { return id; } 
 
-    public void setTrip(Trip trip) {
-        this.trip = trip;
-    }
+    public void setTrip(Trip trip) { this.trip = trip; }
+    public Trip getTrip() { return trip; }
 
-    public Trip getTrip() {
-        return trip;
-    }
+    public void setTitle(String title) { this.title = title; }
+    public String getTitle() { return title; }
 
-    //title setter and getter
-    public void setTitle(String title){
-        this.title = title;
-    }
+    public void setAmount(BigDecimal amount) { this.amount = amount; }
+    public BigDecimal getAmount() { return amount; }
 
-    public String getTitle(){
-        return title;
-    }
+    public void setPayBack(boolean bool) { this.payBack = bool; }
+    public boolean getPayBack() { return payBack; }
 
-    //amount setter and getter
-    public void setAmount(BigDecimal amount){
-        this.amount = amount;
-    }
+    public void setCurrencyCode(String currencyCode) { this.currencyCode = currencyCode; }
+    public String getCurrencyCode() { return currencyCode; }
 
-    public BigDecimal getAmount(){
-        return amount;
-    }
+    public void setExchangeRate(BigDecimal rate) { this.exchangeRate = rate; }
+    public BigDecimal getExchangeRate() { return exchangeRate; }
 
-    //payBack setter and getter
-    public void setPayBack(boolean bool){
-        this.payBack = bool;
-    }
+    public void setDate(String date) { this.date = date; }
+    public String getDate() { return date; }
 
-    public boolean getPayBack(){
-        return payBack;
-    }
-
-    //currencyType setter and getter
-    public void setCurrencyCode(String currencyCode){
-        this.currencyCode = currencyCode;
-    }
-
-    public String getCurrencyCode(){
-        return currencyCode;
-    }
-
-    //rate setter and getter
-    public void setCurrencyRate(BigDecimal rate){
-        this.currencyRate = rate;
-    }
-
-    public BigDecimal getCurrencyRate(){
-        return currencyRate;
-    }
-
-
-    //TODO make sure format is satisfied here or outside
-    //date setter and getter
-    public void setDate(String date){
-        this.date = date;
-    }
-
-    public String getDate(){
-        return date;
-    }
-
-    // Participants setter and getter
-    public void setParticipants(List<Person> participants){ // Takes in a list of participants
-        this.expenseParticipants = participants;
-    }
-
+    public void setParticipants(List<Person> participants) { this.expenseParticipants = participants; } // Takes in a list of participants
     public void setParticipant(Person participant){ // Takes in a single participant
         if (expenseParticipants == null) {
             expenseParticipants = new ArrayList<>();
@@ -139,53 +79,31 @@ public class Expense {
             expenseParticipants.add(participant); 
         }
     }
+    public List<Person> getExpenseParticipants() { return expenseParticipants; }
 
-    public List<Person> getExpenseParticipants(){
-        return expenseParticipants;
-    }
-    
-    /*
-    Payer setter and getter methods.
-    Create a Payer object and add it to the payerList.
-    Parameters:  the payer and the amount paid
-    */
-    public void setPayer(Person payer, BigDecimal paidAmount){
-        payerList.add(new Payer(payer, paidAmount, this));
-    }
+    public void setPayer(Person payer, BigDecimal paidAmount) { payerList.add(new Payer(payer, paidAmount, this)); } // Creates a new Payer object and adds it to the payerList
+    public List<Payer> getPayerList() { return payerList; }
+    public Map<Person, BigDecimal> getPayerMap() { return payersMap; }
 
-    public List<Payer> getPayerList(){
-        return payerList;
-    }
+    public void setSplit(Person person, BigDecimal splitAmount) { splitsList.add(new Splits(person, splitAmount, this)); } // Creates a new Split object and adds it to the splitsList
+    public List<Splits> getSplitsList() { return splitsList; }
+    public Map<Person, BigDecimal> getSplitsMap() { return splitsMap; }
 
-    public Map<Person, BigDecimal> getPayerMap(){
-        return payersMap;
-    }
-    
-    /*
-    Splits setter and getter methods.
-    Create a Splits object and add it to the splitsList.
-    Parameters: the person and their split amount that they are responsible for.
-    */
-    public void setSplit(Person person, BigDecimal splitAmount){
-        splitsList.add(new Splits(person, splitAmount, this));
-    }
+    public Map<Person, BigDecimal> getExpenseBalance() { return expenseBalance; }
+    public Map<Person, BigDecimal> getExpenseBalanceConverted() { return expenseBalanceConverted; }
 
-    public List<Splits> getSplitsList(){
-        return splitsList;
-    }
 
-    public Map<Person, BigDecimal> getSplitsMap(){
-        return splitsMap;
-    }
 
-    // Getters for the expenseBalance and expenseBalanceConverted maps.
-    public Map<Person, BigDecimal> getExpenseBalance(){
-        return expenseBalance;
-    }
 
-    public Map<Person, BigDecimal> getExpenseBalanceConverted(){
-        return expenseBalanceConverted;
-    }
+
+
+    //  BELOW MOVED TO SERVICE LAYER BUT KEPT FOR REFERENCE
+
+
+
+
+
+
 
 
     /*
@@ -233,7 +151,7 @@ public class Expense {
             BigDecimal diffAmount = splitAmount.subtract(paidAmount); // your split - your paid amount = amount you're still responsible for, positive means you owe money, negative means you are owed/down money
     
             expenseBalance.put(person, diffAmount);
-            BigDecimal newValue = diffAmount.divide(currencyRate, 3, RoundingMode.HALF_UP);
+            BigDecimal newValue = diffAmount.divide(exchangeRate, 3, RoundingMode.HALF_UP);
             expenseBalanceConverted.put(person, newValue);
         }
     }
@@ -262,7 +180,7 @@ public class Expense {
                         BigDecimal debtValue = absLentAmount.min(borrowedAmount); 
                         
                         borrowPerson.addIndividualBalance(lenderPerson, debtValue);  // Add the debt to borrowPerson's individualBalance and converted maps
-                        BigDecimal convertedValue = debtValue.divide(currencyRate, 3, RoundingMode.HALF_UP); 
+                        BigDecimal convertedValue = debtValue.divide(exchangeRate, 3, RoundingMode.HALF_UP);
                         borrowPerson.addBalanceConverted(lenderPerson, convertedValue);
 
                         borrowedAmount = borrowedAmount.subtract(debtValue);  // Settling the the debt this round. Loop will continue until borrowedAmount is 0 or less.
@@ -277,7 +195,7 @@ public class Expense {
     
     //New toString to not print key:value with 0.0 because we now initialize the Map fields with 0.0 as default when adding participants. 
     public String toString(){
-        String s = "ID: " + id + "  | Title: " + title + " | Date: " + date + " | Amount: " + amount + " | Rate: " + currencyRate;
+        String s = "ID: " + id + "  | Title: " + title + " | Date: " + date + " | Amount: " + amount + " | Rate: " + exchangeRate;
         
         //Payers
         s += "\nPaid by: {";
