@@ -12,10 +12,10 @@ public class Person {
     private String name;
     
     @Transient
-    private Map<Person, BigDecimal> individualBalance = new HashMap<>(); //Storing exact debt so you know from whom and how much you owe
+    private Map<Person, BigDecimal> debts = new HashMap<>(); //Storing exact debt so you know from whom and how much you owe
     
     @Transient
-    private Map<Person, BigDecimal> balanceConverted = new HashMap<>();
+    private Map<Person, BigDecimal> debtsConverted = new HashMap<>();
 
     public Person(){}
     public Person(String name){
@@ -28,17 +28,17 @@ public class Person {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public Map<Person, BigDecimal> getIndividualBalance(){ return individualBalance; }
-    public Map<Person, BigDecimal> getBalanceConverted(){ return balanceConverted; }
+    public Map<Person, BigDecimal> getDebts(){ return debts; }
+    public Map<Person, BigDecimal> getDebtsConverted(){ return debtsConverted; }
 
     // Used in Expense's calculateIndividualBalance method
-    public void addIndividualBalance(Person person, BigDecimal amount){
-        individualBalance.merge(person, amount, BigDecimal::add);
+    public void addDebt(Person person, BigDecimal amount){
+        debts.merge(person, amount, BigDecimal::add);
     }
 
     // Same but for converted amount
-    public void addBalanceConverted(Person person, BigDecimal amount){
-        balanceConverted.merge(person, amount, BigDecimal::add);
+    public void addDebtConverted(Person person, BigDecimal amount){
+        debtsConverted.merge(person, amount, BigDecimal::add);
     }
 
     //For debugging while testing the expense class printing out results

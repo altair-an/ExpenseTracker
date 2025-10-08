@@ -1,24 +1,25 @@
 package com.altair.expensetracker.service;
-
-import org.springframework.stereotype.Service;
-
-import com.altair.expensetracker.entity.Expense;
-import com.altair.expensetracker.entity.Trip;
-import com.altair.expensetracker.repository.ExpenseRepository;
-import com.altair.expensetracker.repository.TripRepository;
 import java.util.*;
 import java.math.*;
-import com.altair.expensetracker.dto.TripDTO;
+import org.springframework.stereotype.Service;
+
+import com.altair.expensetracker.entity.*;
+import com.altair.expensetracker.repository.*;
+import com.altair.expensetracker.dto.*;
+
 
 @Service
 public class TripService {
 
+    private final PersonRepository personRepository;
+
     private final TripRepository tripRepository;
     private final ExpenseRepository expenseRepository;
 
-    public TripService(TripRepository tripRepository, ExpenseRepository expenseRepository) {
+    public TripService(TripRepository tripRepository, ExpenseRepository expenseRepository, PersonRepository personRepository) {
         this.tripRepository = tripRepository;
         this.expenseRepository = expenseRepository;
+        this.personRepository = personRepository;
     }
 
     public List<TripDTO> getAllTrips() {
@@ -30,7 +31,7 @@ public class TripService {
         }
         for (Trip trip : trips) {
             trip.calculateTotalExpense();
-            tripDTOs.add(converttoDTO(trip));
+            tripDTOs.add(convertToDTO(trip));
         }
         return tripDTOs;
     }
@@ -43,36 +44,55 @@ public class TripService {
             }
             trip.calculateTotalExpense();
         }
-        return converttoDTO(trip);
+        return convertToDTO(trip);
     }
 
-    public Trip createTrip(Trip trip) {
+    public Trip createTrip(TripCreateDTO tripDTO) {
+        Trip trip = convertToEntity(tripDTO);
         return tripRepository.save(trip);
     }
 
-    public void deleteExpense(Long id) {
+    public void deleteTrip(Long id) {
         tripRepository.deleteById(id);
     }
 
-    public TripDTO converttoDTO(Trip trip) {
+    /// DTO-Entity conversion
+
+    // Convert Trip entity to TripDTO
+    public TripDTO convertToDTO(Trip trip) {
         TripDTO dto = new TripDTO();
         List<String> particpants = new ArrayList<>();
-        Map<String, BigDecimal> simplifiedDebt = new HashMap<>();
-        Map<String, BigDecimal> simplifiedDebtConverted = new HashMap<>();
-        dto.setId(trip.getId());
+        Map<String, BigDecimal> simpleDebt = new HashMap<>();
+        Map<String, BigDecimal> simpleDebtConverted = new HashMap<>();
+        dto.setID(trip.getID());
         dto.setTripName(trip.getTripName());
-        for (var person : trip.getTripParticipants()) {
+        for (var person : trip.getParticipants()) {
             particpants.add(person.getName());
         }
-        dto.setTripParticipants(particpants);
-        for (var debt : trip.getTripSimplifiedDebt().entrySet()) {
-            simplifiedDebt.put(debt.getKey().getName(), debt.getValue());
+        dto.setParticipants(particpants);
+        for (var debt : trip.getSimpleDebt().entrySet()) {
+            simpleDebt.put(debt.getKey().getName(), debt.getValue());
         }
-        dto.setTripSimplifiedDebt(simplifiedDebt);
-        for (var debt : trip.getTripSimplifiedDebtConverted().entrySet()) {
-            simplifiedDebtConverted.put(debt.getKey().getName(), debt.getValue());
+        dto.setSimpledDebt(simpleDebt);
+        for (var debt : trip.getSimpleDebtConverted().entrySet()) {
+            simpleDebtConverted.put(debt.getKey().getName(), debt.getValue());
         }
-        dto.setTripSimplifiedDebtConverted(simplifiedDebtConverted);
+        dto.setSimpleDebtConverted(simpleDebtConverted);
         return dto;
+    }
+
+    // Convert TripDTO to Trip entity
+    public Trip convertToEntity(TripCreateDTO dto) {
+        Trip trip = new Trip();
+        trip.setTripName(dto.getTripName());
+        List<Person> participants = new ArrayList<>();
+        for (PersonDTO personDTO : dto.getParticipants()) {
+            Person person;
+            person = personRepository.findById(personDTO.getID())
+                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + personDTO.getID()));
+            participants.add(person);
+        }
+        trip.addParticipants(participants);
+        return trip;
     }
 }

@@ -1,28 +1,34 @@
-### Get all trips
+### TRIPS GET ALL
 GET http://localhost:8080/api/trips
 
-### Get a specific trip by ID
+### TRIP GET BY ID
 GET http://localhost:8080/api/trips/1
 
-### Create a new trip
+### TRIP CREATE/POST
 POST http://localhost:8080/api/trips
 Content-Type: application/json
 
 {
-  "name": "New Trip"
+  "tripName": "Japan Adventure",
+  "participants": [
+    { "id": 1, "name": "Henry" },
+    { "id": 2, "name": "Van" },
+    { "id": 3, "name": "Khoa" }
+  ]
 }
 
+### TRIP ID DELETE
+DELETE http://localhost:8080/api/trips/2
 
 
 
-
-### Get all expenses for a trip
+### TRIP ID ALL EXPENSES
 GET http://localhost:8080/api/trips/1/expenses
 
-### Get a specific expense by ID under a trip
+### TRIP ID SPECIFIC EXPENSE
 GET http://localhost:8080/api/trips/1/expenses/3
 
-### Get a specific expense by ID
+### EXPENSE BY ID GET
 GET http://localhost:8080/api/expenses/1
 
 
@@ -31,14 +37,14 @@ GET http://localhost:8080/api/expenses/1
 
 
 
-### Delete an expense by ID
+### EXPENSE ID DELETE
 DELETE http://localhost:8080/api/expenses/3
 
 
 
 
 
-### Create an expense for a trip
+### TRIP ID - EXPENSE CREATE/POST
 POST http://localhost:8080/api/trips/1/expenses
 Content-Type: application/json
 
@@ -47,16 +53,16 @@ Content-Type: application/json
   "amount": 3000,
   "date": "2025-10-06",
   "exchangeRate": 148,
-  "expenseParticipants": [
+  "participants": [
     { "id": 1, "name": "Henry" },
     { "id": 2, "name": "Van" },
     { "id": 3, "name": "Khoa" }
   ],
-  "payerList": [
+  "payers": [
     { "person": { "id": 1, "name": "Henry" }, "amount": 2000 },
     { "person": { "id": 2, "name": "Van" }, "amount": 1000 }
   ],
-  "splitsList": [
+  "splits": [
     { "person": { "id": 1, "name": "Henry" }, "amount": 1000 },
     { "person": { "id": 2, "name": "Van" }, "amount": 1000 },
     { "person": { "id": 3, "name": "Khoa" }, "amount": 1000 }
@@ -66,5 +72,5 @@ Content-Type: application/json
 
 
 
-### Get Persons
+### PERSONS  - GET ALL
 GET http://localhost:8080/api/persons

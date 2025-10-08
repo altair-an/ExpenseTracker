@@ -3,12 +3,9 @@ package com.altair.expensetracker.controller;
 import com.altair.expensetracker.entity.Trip;
 import com.altair.expensetracker.service.ExpenseService;
 import com.altair.expensetracker.service.TripService;
-import com.altair.expensetracker.dto.ExpenseCreateDTO;
-import com.altair.expensetracker.dto.ExpenseDTO;
-import com.altair.expensetracker.dto.TripDTO;
+import com.altair.expensetracker.dto.*;
 
 import jakarta.persistence.EntityNotFoundException;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +33,18 @@ public class TripController {
     }
 
     @PostMapping
-    public Trip createTrip(@RequestBody Trip trip) {
+    public Trip createTrip(@RequestBody TripCreateDTO trip) {
         return tripService.createTrip(trip);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTrip(@PathVariable Long id) {
+        try {
+            tripService.deleteTrip(id);
+            return ResponseEntity.noContent().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // Creating an expense for a specific trip at the endpoint /api/trips/{tripId}/expenses

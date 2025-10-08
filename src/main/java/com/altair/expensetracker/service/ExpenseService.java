@@ -2,9 +2,8 @@ package com.altair.expensetracker.service;
 
 import com.altair.expensetracker.repository.*;
 import com.altair.expensetracker.entity.*;
-import com.altair.expensetracker.dto.ExpenseCreateDTO;
-import com.altair.expensetracker.dto.ExpenseCreateDTO.PersonDTO;
-import com.altair.expensetracker.dto.ExpenseDTO;
+import com.altair.expensetracker.dto.*;
+
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,7 @@ public class ExpenseService {
     }
 
     // Retrieve a single expense by ID
-    public ExpenseDTO getExpenseById(Long id) {
+    public ExpenseDTO getExpenseByID(Long id) {
         Optional<Expense> optionalExpense = expenseRepository.findById(id);
         if (optionalExpense.isPresent()) {
             Expense expense = optionalExpense.get();
@@ -91,7 +90,7 @@ public class ExpenseService {
 
     // Helper method for even splits
     private void generateEvenSplits(Expense expense) {
-        List<Person> people = expense.getExpenseParticipants();
+        List<Person> people = expense.getParticipants();
         BigDecimal amountPerPerson = expense.getAmount().divide(new BigDecimal(people.size()), 
             3, 
             RoundingMode.HALF_UP);
@@ -110,7 +109,7 @@ public class ExpenseService {
         Trip trip = tripRepository.findById(tripId)
             .orElseThrow(() -> new EntityNotFoundException("Trip not found"));
         
-        Expense expense = convertCreateDTOToEntity(expenseCreateDTO);
+        Expense expense = convertToEntity(expenseCreateDTO);
         expense.setTrip(trip);    
         calculateAll(expense);
         Expense saved = expenseRepository.save(expense);
@@ -136,9 +135,9 @@ public class ExpenseService {
         tripRepository.findById(tripId)
             .orElseThrow(() -> new EntityNotFoundException("Trip not found"));
 
-        ExpenseDTO dto = getExpenseById(expenseId);
+        ExpenseDTO dto = getExpenseByID(expenseId);
 
-        if (dto.getTripID() == null || !dto.getTripID().equals(tripId.toString())) {
+        if (dto.getTripID() == null || !dto.getTripID().equals(tripId)) {
             throw new EntityNotFoundException("Expense does not belong to this trip");
         }
         return dto;
@@ -155,19 +154,19 @@ public class ExpenseService {
     // DTO : Converting Expense entity to ExpenseDTO for GET requests
     public ExpenseDTO convertToDTO(Expense expense) {
         ExpenseDTO dto = new ExpenseDTO();
-        dto.setId(expense.getID());
+        dto.setID(expense.getID());
         dto.setTitle(expense.getTitle());
         dto.setAmount(expense.getAmount());
         dto.setDate(expense.getDate());
         dto.setCurrencyCode(expense.getCurrencyCode());
         dto.setExchangeRate(expense.getExchangeRate());
-        dto.setTripID(expense.getTrip() != null ? expense.getTrip().getId().toString() : null);
+        dto.setTripID(expense.getTrip() != null ? expense.getTrip().getID() : null);
         
         List<String> participantNames = new ArrayList<>();
-        for (Person person : expense.getExpenseParticipants()) {
+        for (Person person : expense.getParticipants()) {
             participantNames.add(person.getName());
         }
-        dto.setExpenseParticipants(participantNames);
+        dto.setParticipants(participantNames);
         
         Map<String, BigDecimal> payersMap = new HashMap<>();
         for (Map.Entry<Person, BigDecimal> entry : expense.getPayerMap().entrySet()) {
@@ -197,7 +196,7 @@ public class ExpenseService {
     }
 
     // DTO : Converting ExpenseCreateDTO to Expense entity for POST requests
-    public Expense convertCreateDTOToEntity(ExpenseCreateDTO dto) {
+    public Expense convertToEntity(ExpenseCreateDTO dto) {
         Expense expense = new Expense();
         expense.setTitle(dto.getTitle());
         expense.setAmount(dto.getAmount());
@@ -206,25 +205,25 @@ public class ExpenseService {
         
         // Participants
         List<Person> participants = new ArrayList<>();
-        for (PersonDTO personDTO : dto.getExpenseParticipants()) {
+        for (PersonDTO personDTO : dto.getParticipants()) {
             Person person;
-            person = personRepository.findById(personDTO.getId())
-                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + personDTO.getId()));
+            person = personRepository.findById(personDTO.getID())
+                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + personDTO.getID()));
             participants.add(person);
         }
         expense.setParticipants(participants);
 
         // Payers
         for (ExpenseCreateDTO.PayerDTO payerDTO : dto.getPayerList()) {
-            Person person = personRepository.findById(payerDTO.getPerson().getId())
-                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + payerDTO.getPerson().getId()));
+            Person person = personRepository.findById(payerDTO.getPerson().getID())
+                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + payerDTO.getPerson().getID()));
             expense.setPayer(person, payerDTO.getAmount());
         }
 
         // Splits
         for (ExpenseCreateDTO.SplitsDTO splitDTO : dto.getSplitsList()) {
-            Person person = personRepository.findById(splitDTO.getPerson().getId())
-                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + splitDTO.getPerson().getId()));
+            Person person = personRepository.findById(splitDTO.getPerson().getID())
+                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + splitDTO.getPerson().getID()));
             expense.setSplit(person, splitDTO.getAmount());
         }
 
@@ -254,7 +253,7 @@ public class ExpenseService {
         Map<Person, BigDecimal> expenseBalance = expense.getExpenseBalance();
         Map<Person, BigDecimal> expenseBalanceConverted = expense.getExpenseBalanceConverted();
         BigDecimal exchangeRate = expense.getExchangeRate();
-        List<Person> participants = expense.getExpenseParticipants();
+        List<Person> participants = expense.getParticipants();
         
         updateMaps(expense); // Calculate payerMap and splitsMap from the lists
         
@@ -270,16 +269,17 @@ public class ExpenseService {
         }
     }
 
-    private void calculateIndividualBalances(Expense expense) {
+    // Calculate debts and debtsConverted for each participant based on expenseBalance
+    private void calculateDebts(Expense expense) {
         // Finding the borrower (positive value)
         for (Map.Entry<Person, BigDecimal> entry : expense.getExpenseBalance().entrySet()) {
-            Person borrowPerson = entry.getKey();
+            Person borrower = entry.getKey();
             BigDecimal borrowedAmount = entry.getValue();
 
             if (borrowedAmount.compareTo(BigDecimal.ZERO) > 0) { // Find the borrower if positive value
                 // Finding the lender (negative value)
                 for (Map.Entry<Person, BigDecimal> entryB : expense.getExpenseBalance().entrySet()) {
-                    Person lendPerson = entryB.getKey();
+                    Person lender = entryB.getKey();
                     BigDecimal lentAmount = entryB.getValue();
 
                     if (borrowedAmount.compareTo(BigDecimal.ZERO) <= 0) break;
@@ -288,15 +288,18 @@ public class ExpenseService {
                         BigDecimal absLentAmount = lentAmount.abs(); // Get the absolute value of the lent amount and find the min
                         BigDecimal debtValue = absLentAmount.min(borrowedAmount); 
 
-                        borrowPerson.getIndividualBalance().merge(lendPerson, debtValue, BigDecimal::add); // Add the debt to borrowPerson's individualBalance and converted maps
+                        //borrower.getDebts().merge(lender, debtValue, BigDecimal::add); // Add the debt to borrower's debts and converted maps
+                        borrower.addDebt(lender, debtValue);  // Add the debt to borrower's debts and converted maps
+
                         BigDecimal convertedDebtValue = debtValue.divide(expense.getExchangeRate(), 3, RoundingMode.HALF_UP);
-                        borrowPerson.getBalanceConverted().merge(lendPerson, convertedDebtValue, BigDecimal::add);
+                        //borrower.getDebtsConverted().merge(lender, convertedDebtValue, BigDecimal::add);
+                        borrower.addDebtConverted(lender, convertedDebtValue);
                         
                         borrowedAmount = borrowedAmount.subtract(debtValue);  // Settling the the debt this round. Loop will continue until borrowedAmount is 0 or less.
-                        expense.getExpenseBalance().put(lendPerson, lentAmount.add(debtValue)); // Update the expenseBalance for lenderPerson to reflect settled debt
+                        expense.getExpenseBalance().put(lender, lentAmount.add(debtValue)); // Update the expenseBalance for lender to reflect settled debt
                     }
                 }
-                expense.getExpenseBalance().put(borrowPerson, borrowedAmount); // Update expenseBalance for borrowPerson with the remaining balance after settling debts
+                expense.getExpenseBalance().put(borrower, borrowedAmount); // Update expenseBalance for borrower with the remaining balance after settling debts
             }
         }
         calculateExpenseBalance(expense); // Recalculating the expense balance HashMap back to original values
@@ -305,7 +308,7 @@ public class ExpenseService {
     // Calculate all derived fields in one go
     public void calculateAll(Expense expense) {
         calculateExpenseBalance(expense);
-        calculateIndividualBalances(expense);
+        calculateDebts(expense);
     }
 
 

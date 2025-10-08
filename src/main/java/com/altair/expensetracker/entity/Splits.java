@@ -29,7 +29,7 @@ public class Splits {
     }
     
     // Getters and Setters
-    public Long getId() { return id; }
+    public Long getID() { return id; }
 
     public Person getPerson() { return person; }
     public void setPerson(Person person) { this.person = person; }

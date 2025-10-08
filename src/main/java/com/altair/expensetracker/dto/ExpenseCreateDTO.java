@@ -3,13 +3,40 @@ package com.altair.expensetracker.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+/*
+    Example JSON for creating an expense:
+ {
+  "title": "Lunch",
+  "amount": 3000,
+  "date": "2025-10-06",
+  "exchangeRate": 148,
+  "participants": [
+    { "id": 1, "name": "Person A" },
+    { "id": 2, "name": "Person B" },
+    { "id": 3, "name": "Person C" }
+  ],
+  "payers": [
+    { "person": { "id": 1, "name": "Person A" }, "amount": 2000 },
+    { "person": { "id": 2, "name": "Person B" }, "amount": 1000 }
+  ],
+  "splits": [
+    { "person": { "id": 1, "name": "Person A" }, "amount": 1000 },
+    { "person": { "id": 2, "name": "Person B" }, "amount": 1000 },
+    { "person": { "id": 3, "name": "Person C" }, "amount": 1000 }
+  ]
+}
+ */
 public class ExpenseCreateDTO {
     private String title;
     private BigDecimal amount;
     private String date;
     private BigDecimal exchangeRate;
-    private List<PersonDTO> expenseParticipants;
+    private List<PersonDTO> participants;
+    @JsonProperty("payers")
     private List<PayerDTO> payerList;
+    @JsonProperty("splits")
     private List<SplitsDTO> splitsList;
 
     // Getters and setters
@@ -21,25 +48,14 @@ public class ExpenseCreateDTO {
     public void setDate(String date) { this.date = date; }
     public BigDecimal getExchangeRate() { return exchangeRate; }
     public void setExchangeRate(BigDecimal exchangeRate) { this.exchangeRate = exchangeRate; }
-    public List<PersonDTO> getExpenseParticipants() { return expenseParticipants; }
-    public void setExpenseParticipants(List<PersonDTO> expenseParticipants) { this.expenseParticipants = expenseParticipants; }
+    public List<PersonDTO> getParticipants() { return participants; }
+    public void setParticipants(List<PersonDTO> expenseParticipants) { this.participants = expenseParticipants; }
     public List<PayerDTO> getPayerList() { return payerList; }
     public void setPayerList(List<PayerDTO> payerList) { this.payerList = payerList; }
     public List<SplitsDTO> getSplitsList() { return splitsList; }
     public void setSplitsList(List<SplitsDTO> splitsList) { this.splitsList = splitsList; }
     
     // Nested DTO classes
-
-    public static class PersonDTO {
-        private Long id;
-        private String name;
-
-        // Getters and setters
-        public Long getId() { return id; }
-        public void setId(Long id) { this.id = id; }
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
-    }
 
     public static class PayerDTO {
         private PersonDTO person;

@@ -12,7 +12,7 @@ public class Expense {
     private Long id;
     private String title;
     private BigDecimal amount;
-    private boolean payBack = false;  //indicates if the expense is a payback or not
+    private boolean isPayBack = false;  //indicates if the expense is a payback or not
     private String currencyCode;  
     private BigDecimal exchangeRate;
     private String date; 
@@ -21,7 +21,7 @@ public class Expense {
     @JsonBackReference
     private Trip trip;
     @ManyToMany
-    private List<Person> expenseParticipants; 
+    private List<Person> participants; 
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     //@JsonIgnore 
@@ -31,7 +31,7 @@ public class Expense {
     //@JsonIgnore 
     private List<Splits> splitsList = new ArrayList<>();
     @Transient
-    private Map<Person, BigDecimal> payersMap = new HashMap<>();  //keep track of who paid the expense
+    private Map<Person, BigDecimal> payerMap = new HashMap<>();  //keep track of who paid the expense
     @Transient
     private Map<Person, BigDecimal> splitsMap = new HashMap<>(); //keep track of who's responsible for x amount
     @Transient
@@ -58,8 +58,8 @@ public class Expense {
     public void setAmount(BigDecimal amount) { this.amount = amount; }
     public BigDecimal getAmount() { return amount; }
 
-    public void setPayBack(boolean bool) { this.payBack = bool; }
-    public boolean getPayBack() { return payBack; }
+    public void setIsPayBack(boolean bool) { this.isPayBack = bool; }
+    public boolean isPayBack() { return isPayBack; }
 
     public void setCurrencyCode(String currencyCode) { this.currencyCode = currencyCode; }
     public String getCurrencyCode() { return currencyCode; }
@@ -70,20 +70,20 @@ public class Expense {
     public void setDate(String date) { this.date = date; }
     public String getDate() { return date; }
 
-    public void setParticipants(List<Person> participants) { this.expenseParticipants = participants; } // Takes in a list of participants
+    public void setParticipants(List<Person> participants) { this.participants = participants; } // Takes in a list of participants
     public void setParticipant(Person participant){ // Takes in a single participant
-        if (expenseParticipants == null) {
-            expenseParticipants = new ArrayList<>();
+        if (participants == null) {
+            participants = new ArrayList<>();
         }
-        if (!expenseParticipants.contains(participant)) {
-            expenseParticipants.add(participant); 
+        if (!participants.contains(participant)) {
+            participants.add(participant); 
         }
     }
-    public List<Person> getExpenseParticipants() { return expenseParticipants; }
+    public List<Person> getParticipants() { return participants; }
 
     public void setPayer(Person payer, BigDecimal paidAmount) { payerList.add(new Payer(payer, paidAmount, this)); } // Creates a new Payer object and adds it to the payerList
     public List<Payer> getPayerList() { return payerList; }
-    public Map<Person, BigDecimal> getPayerMap() { return payersMap; }
+    public Map<Person, BigDecimal> getPayerMap() { return payerMap; }
 
     public void setSplit(Person person, BigDecimal splitAmount) { splitsList.add(new Splits(person, splitAmount, this)); } // Creates a new Split object and adds it to the splitsList
     public List<Splits> getSplitsList() { return splitsList; }
@@ -112,22 +112,22 @@ public class Expense {
     */
     public void evenSplit(){
         BigDecimal even = amount.divide(
-            BigDecimal.valueOf(expenseParticipants.size()),
+            BigDecimal.valueOf(participants.size()),
       3, 
             RoundingMode.HALF_UP 
         );
 
-        for (int i = 0; i < expenseParticipants.size(); i++){
-            setSplit(expenseParticipants.get(i), even); 
+        for (int i = 0; i < participants.size(); i++){
+            setSplit(participants.get(i), even); 
         }
     }
 
     public void updateMaps() {
         // Resetting hashmaps
-        payersMap.clear();
+        payerMap.clear();
         splitsMap.clear();
         for (Payer payer : payerList) {
-            payersMap.merge(payer.getPerson(), payer.getAmount(), BigDecimal::add);
+            payerMap.merge(payer.getPerson(), payer.getAmount(), BigDecimal::add);
         }
         for (Splits split : splitsList) {
             splitsMap.merge(split.getPerson(), split.getAmount(), BigDecimal::add);
@@ -145,8 +145,8 @@ public class Expense {
     */ 
     public void calculateExpense() {
         updateMaps();
-        for (Person person : expenseParticipants) {
-            BigDecimal paidAmount = payersMap.getOrDefault(person, BigDecimal.ZERO);
+        for (Person person : participants) {
+            BigDecimal paidAmount = payerMap.getOrDefault(person, BigDecimal.ZERO);
             BigDecimal splitAmount = splitsMap.getOrDefault(person, BigDecimal.ZERO);
             BigDecimal diffAmount = splitAmount.subtract(paidAmount); // your split - your paid amount = amount you're still responsible for, positive means you owe money, negative means you are owed/down money
     
@@ -179,9 +179,9 @@ public class Expense {
                         BigDecimal absLentAmount = lentAmount.abs(); // Get the absolute value of the lent amount and find the min
                         BigDecimal debtValue = absLentAmount.min(borrowedAmount); 
                         
-                        borrowPerson.addIndividualBalance(lenderPerson, debtValue);  // Add the debt to borrowPerson's individualBalance and converted maps
+                        borrowPerson.addDebt(lenderPerson, debtValue);  // Add the debt to borrowPerson's individualBalance and converted maps
                         BigDecimal convertedValue = debtValue.divide(exchangeRate, 3, RoundingMode.HALF_UP);
-                        borrowPerson.addBalanceConverted(lenderPerson, convertedValue);
+                        borrowPerson.addDebtConverted(lenderPerson, convertedValue);
 
                         borrowedAmount = borrowedAmount.subtract(debtValue);  // Settling the the debt this round. Loop will continue until borrowedAmount is 0 or less.
                         expenseBalance.put(lenderPerson, lentAmount.add(debtValue)); // Update the expenseBalance for lenderPerson to reflect settled debt
@@ -200,7 +200,7 @@ public class Expense {
         //Payers
         s += "\nPaid by: {";
         String data = "";
-        for (Map.Entry<Person, BigDecimal> pair : payersMap.entrySet()) {
+        for (Map.Entry<Person, BigDecimal> pair : payerMap.entrySet()) {
             if (pair.getValue().compareTo(BigDecimal.ZERO) != 0.0) data += " " + pair.getKey() + "=" + pair.getValue() + ",";
         }
         s += data.trim().replaceAll(",$", "") + "}";

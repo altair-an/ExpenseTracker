@@ -17,20 +17,23 @@ public class Trip {
     @JsonManagedReference
     private List<Expense> expenseList;
     @Transient
-    private Map<Person, BigDecimal> tripSimplifiedDebt = new HashMap<>();  // Simplified net balances for each person in the trip
+    private Map<Person, BigDecimal> simpleDebt = new HashMap<>();  // Simplified net balances for each person in the trip
     @Transient
-    private Map<Person, BigDecimal> tripSimplifiedDebtConverted = new HashMap<>(); // Simplified net balances in converted currency
+    private Map<Person, BigDecimal> simpleDebtConverted = new HashMap<>(); // Simplified net balances in converted currency
 
-    public Trip() {};
-    public Trip(String trip_name){
-        this.tripName = trip_name;
+    public Trip() {
+        this.tripParticipants = new ArrayList<>();
+        this.expenseList = new ArrayList<>();
+    };
+    public Trip(String tripName){
+        this.tripName = tripName;
         this.tripParticipants = new ArrayList<>();
         this.expenseList = new ArrayList<>();
     }
 
     // Getters and Setters
     public String getTripName(){ return tripName; }
-    public void setTripName(String trip_name){ this.tripName = trip_name; }
+    public void setTripName(String tripName){ this.tripName = tripName; }
 
     public void addPerson(String person_name){
         Person person = new Person(person_name);
@@ -43,23 +46,23 @@ public class Trip {
             }
         }
     }
-    public List<Person> getTripParticipants(){ return tripParticipants; }
+    public List<Person> getParticipants(){ return tripParticipants; }
 
     public void addExpense(Expense expense){expenseList.add(expense);}
     public List<Expense> getExpenseList(){return expenseList;}
 
-    public Long getId() {return id;}
-    public void setId(Long id) {this.id = id;}
+    public Long getID() {return id;}
+    public void setID(Long id) {this.id = id;}
 
-    public Map<Person, BigDecimal> getTripSimplifiedDebt() {return tripSimplifiedDebt;}
-    public Map<Person, BigDecimal> getTripSimplifiedDebtConverted() {return tripSimplifiedDebtConverted;}
+    public Map<Person, BigDecimal> getSimpleDebt() {return simpleDebt;}
+    public Map<Person, BigDecimal> getSimpleDebtConverted() {return simpleDebtConverted;}
 
     // Calculate the total expense for the trip by aggregating expenses from all associated Expense entities
     // This method updates the tripSimplifiedDebt and tripSimplifiedDebtConverted maps
     public void calculateTotalExpense(){
         for (Expense expense : expenseList) {
-            expense.getExpenseBalance().forEach((person, value) -> tripSimplifiedDebt.merge(person, value, BigDecimal::add));
-            expense.getExpenseBalanceConverted().forEach((person, value) -> tripSimplifiedDebtConverted.merge(person, value, BigDecimal::add));
+            expense.getExpenseBalance().forEach((person, value) -> simpleDebt.merge(person, value, BigDecimal::add));
+            expense.getExpenseBalanceConverted().forEach((person, value) -> simpleDebtConverted.merge(person, value, BigDecimal::add));
         }
     }  
 }
