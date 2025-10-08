@@ -17,9 +17,9 @@ public class Trip {
     @JsonManagedReference
     private List<Expense> expenseList;
     @Transient
-    private Map<Person, BigDecimal> tripSimplifiedDebt = new HashMap<>();
+    private Map<Person, BigDecimal> tripSimplifiedDebt = new HashMap<>();  // Simplified net balances for each person in the trip
     @Transient
-    private Map<Person, BigDecimal> tripSimplifiedDebtConverted = new HashMap<>();
+    private Map<Person, BigDecimal> tripSimplifiedDebtConverted = new HashMap<>(); // Simplified net balances in converted currency
 
     public Trip() {};
     public Trip(String trip_name){
@@ -54,11 +54,12 @@ public class Trip {
     public Map<Person, BigDecimal> getTripSimplifiedDebt() {return tripSimplifiedDebt;}
     public Map<Person, BigDecimal> getTripSimplifiedDebtConverted() {return tripSimplifiedDebtConverted;}
 
+    // Calculate the total expense for the trip by aggregating expenses from all associated Expense entities
+    // This method updates the tripSimplifiedDebt and tripSimplifiedDebtConverted maps
     public void calculateTotalExpense(){
         for (Expense expense : expenseList) {
             expense.getExpenseBalance().forEach((person, value) -> tripSimplifiedDebt.merge(person, value, BigDecimal::add));
             expense.getExpenseBalanceConverted().forEach((person, value) -> tripSimplifiedDebtConverted.merge(person, value, BigDecimal::add));
         }
-
     }  
 }
