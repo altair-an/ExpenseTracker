@@ -1,6 +1,5 @@
 package com.altair.expensetracker.controller;
 
-import com.altair.expensetracker.entity.Expense;
 import com.altair.expensetracker.entity.Trip;
 import com.altair.expensetracker.service.ExpenseService;
 import com.altair.expensetracker.service.TripService;
