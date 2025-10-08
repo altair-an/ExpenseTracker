@@ -62,3 +62,9 @@ Content-Type: application/json
     { "person": { "id": 3, "name": "Khoa" }, "amount": 1000 }
   ]
 }
+
+
+
+
+### Get Persons
+GET http://localhost:8080/api/persons
