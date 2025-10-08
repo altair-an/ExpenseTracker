@@ -12,7 +12,7 @@ public class ExpenseDTO {
     private String date;
     private String currencyCode; 
     private BigDecimal exchangeRate; 
-    private String tripID;  
+    private Long tripID;  
     @JsonProperty("participants")
     private List<String> expenseParticipants;
     @JsonProperty("payers")
@@ -26,8 +26,8 @@ public class ExpenseDTO {
 
 
     // Getters and Setters
-    public Long getId() { return id;}
-    public void setId(Long id) { this.id = id;}
+    public Long getID() { return id;}
+    public void setID(Long id) { this.id = id;}
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -47,8 +47,8 @@ public class ExpenseDTO {
     public String getCurrencyCode() { return currencyCode; }
     public void setCurrencyCode(String currencyCode) { this.currencyCode = currencyCode; }
 
-    public String getTripID() { return tripID; }
-    public void setTripID(String tripID) { this.tripID = tripID; }
+    public Long getTripID() { return tripID; }
+    public void setTripID(Long tripID) { this.tripID = tripID; }
 
     public Map<String, BigDecimal> getPayersMap() { return payersMap; }
     public void setPayersMap(Map<String, BigDecimal> payersMap) { this.payersMap = payersMap; }

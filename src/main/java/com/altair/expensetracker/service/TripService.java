@@ -30,7 +30,7 @@ public class TripService {
         }
         for (Trip trip : trips) {
             trip.calculateTotalExpense();
-            tripDTOs.add(converttoDTO(trip));
+            tripDTOs.add(convertToDTO(trip));
         }
         return tripDTOs;
     }
@@ -43,7 +43,7 @@ public class TripService {
             }
             trip.calculateTotalExpense();
         }
-        return converttoDTO(trip);
+        return convertToDTO(trip);
     }
 
     public Trip createTrip(Trip trip) {
@@ -54,25 +54,25 @@ public class TripService {
         tripRepository.deleteById(id);
     }
 
-    public TripDTO converttoDTO(Trip trip) {
+    public TripDTO convertToDTO(Trip trip) {
         TripDTO dto = new TripDTO();
         List<String> particpants = new ArrayList<>();
-        Map<String, BigDecimal> simplifiedDebt = new HashMap<>();
-        Map<String, BigDecimal> simplifiedDebtConverted = new HashMap<>();
-        dto.setId(trip.getId());
-        dto.setTripName(trip.getTripName());
-        for (var person : trip.getTripParticipants()) {
+        Map<String, BigDecimal> simpleDebt = new HashMap<>();
+        Map<String, BigDecimal> simpleDebtConverted = new HashMap<>();
+        dto.setID(trip.getID());
+        dto.setName(trip.getName());
+        for (var person : trip.getParticipants()) {
             particpants.add(person.getName());
         }
-        dto.setTripParticipants(particpants);
-        for (var debt : trip.getTripSimplifiedDebt().entrySet()) {
-            simplifiedDebt.put(debt.getKey().getName(), debt.getValue());
+        dto.setParticipants(particpants);
+        for (var debt : trip.getSimpleDebt().entrySet()) {
+            simpleDebt.put(debt.getKey().getName(), debt.getValue());
         }
-        dto.setTripSimplifiedDebt(simplifiedDebt);
-        for (var debt : trip.getTripSimplifiedDebtConverted().entrySet()) {
-            simplifiedDebtConverted.put(debt.getKey().getName(), debt.getValue());
+        dto.setSimpledDebt(simpleDebt);
+        for (var debt : trip.getSimpleDebtConverted().entrySet()) {
+            simpleDebtConverted.put(debt.getKey().getName(), debt.getValue());
         }
-        dto.setTripSimplifiedDebtConverted(simplifiedDebtConverted);
+        dto.setSimpleDebtConverted(simpleDebtConverted);
         return dto;
     }
 }

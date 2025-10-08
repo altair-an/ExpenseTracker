@@ -12,7 +12,7 @@ public class Expense {
     private Long id;
     private String title;
     private BigDecimal amount;
-    private boolean payBack = false;  //indicates if the expense is a payback or not
+    private boolean isPayBack = false;  //indicates if the expense is a payback or not
     private String currencyCode;  
     private BigDecimal exchangeRate;
     private String date; 
@@ -58,8 +58,8 @@ public class Expense {
     public void setAmount(BigDecimal amount) { this.amount = amount; }
     public BigDecimal getAmount() { return amount; }
 
-    public void setPayBack(boolean bool) { this.payBack = bool; }
-    public boolean getPayBack() { return payBack; }
+    public void setPayBack(boolean bool) { this.isPayBack = bool; }
+    public boolean isPayBack() { return isPayBack; }
 
     public void setCurrencyCode(String currencyCode) { this.currencyCode = currencyCode; }
     public String getCurrencyCode() { return currencyCode; }
@@ -79,7 +79,7 @@ public class Expense {
             expenseParticipants.add(participant); 
         }
     }
-    public List<Person> getExpenseParticipants() { return expenseParticipants; }
+    public List<Person> getParticipants() { return expenseParticipants; }
 
     public void setPayer(Person payer, BigDecimal paidAmount) { payerList.add(new Payer(payer, paidAmount, this)); } // Creates a new Payer object and adds it to the payerList
     public List<Payer> getPayerList() { return payerList; }
@@ -179,9 +179,9 @@ public class Expense {
                         BigDecimal absLentAmount = lentAmount.abs(); // Get the absolute value of the lent amount and find the min
                         BigDecimal debtValue = absLentAmount.min(borrowedAmount); 
                         
-                        borrowPerson.addIndividualBalance(lenderPerson, debtValue);  // Add the debt to borrowPerson's individualBalance and converted maps
+                        borrowPerson.addDebt(lenderPerson, debtValue);  // Add the debt to borrowPerson's individualBalance and converted maps
                         BigDecimal convertedValue = debtValue.divide(exchangeRate, 3, RoundingMode.HALF_UP);
-                        borrowPerson.addBalanceConverted(lenderPerson, convertedValue);
+                        borrowPerson.addDebtConverted(lenderPerson, convertedValue);
 
                         borrowedAmount = borrowedAmount.subtract(debtValue);  // Settling the the debt this round. Loop will continue until borrowedAmount is 0 or less.
                         expenseBalance.put(lenderPerson, lentAmount.add(debtValue)); // Update the expenseBalance for lenderPerson to reflect settled debt

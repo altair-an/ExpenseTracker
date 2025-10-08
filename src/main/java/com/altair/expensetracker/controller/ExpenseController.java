@@ -25,7 +25,7 @@ public class ExpenseController {
 
     @GetMapping("/{id}")
     public ExpenseDTO getExpenseById(@PathVariable Long id) {
-        return expenseService.getExpenseById(id);
+        return expenseService.getExpenseByID(id);
     }
 
     @PostMapping

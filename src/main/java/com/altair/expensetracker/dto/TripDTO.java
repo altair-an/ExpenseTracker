@@ -10,23 +10,23 @@ public class TripDTO {
     private String tripName;
     @JsonProperty("participants")
     private List<String> tripParticipants;
-    @JsonProperty("simplifiedDebts")
-    private Map<String, BigDecimal> tripSimplifiedDebt;
-    @JsonProperty("convertedSimplifiedDebts")
-    private Map<String, BigDecimal> tripSimplifiedDebtConverted;
+    @JsonProperty("simpleDebts")
+    private Map<String, BigDecimal> simpledDebt;
+    @JsonProperty("convertedSimpleDebts")
+    private Map<String, BigDecimal> simpleDebtConverted;
 
-    public Long getId() { return id;}
-    public void setId(Long id) { this.id = id;}
+    public Long getID() { return id;}
+    public void setID(Long id) { this.id = id;}
 
-    public String getTripName() { return tripName;}
-    public void setTripName(String tripName) {this.tripName = tripName;}
+    public String getName() { return tripName;}
+    public void setName(String tripName) {this.tripName = tripName;}
 
-    public List<String> getTripParticipants() {return tripParticipants;}
-    public void setTripParticipants(List<String> tripParticipants) {this.tripParticipants = tripParticipants;}
+    public List<String> getParticipants() {return tripParticipants;}
+    public void setParticipants(List<String> tripParticipants) {this.tripParticipants = tripParticipants;}
 
-    public Map<String, BigDecimal> getTripSimplifiedDebt() {return tripSimplifiedDebt;}
-    public void setTripSimplifiedDebt(Map<String, BigDecimal> tripSimplifiedDebt) {this.tripSimplifiedDebt = tripSimplifiedDebt;}
+    public Map<String, BigDecimal> getSimpledDebt() {return simpledDebt;}
+    public void setSimpledDebt(Map<String, BigDecimal> simpledDebt) {this.simpledDebt = simpledDebt;}
 
-    public Map<String, BigDecimal> getTripSimplifiedDebtConverted() {return tripSimplifiedDebtConverted;}
-    public void setTripSimplifiedDebtConverted(Map<String, BigDecimal> tripSimplifiedDebtConverted) {this.tripSimplifiedDebtConverted = tripSimplifiedDebtConverted;}
+    public Map<String, BigDecimal> getSimpleDebtConverted() {return simpleDebtConverted;}
+    public void setSimpleDebtConverted(Map<String, BigDecimal> simpleDebtConverted) {this.simpleDebtConverted = simpleDebtConverted;}
 }
