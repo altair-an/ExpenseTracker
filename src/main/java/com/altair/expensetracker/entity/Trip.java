@@ -21,16 +21,19 @@ public class Trip {
     @Transient
     private Map<Person, BigDecimal> simpleDebtConverted = new HashMap<>(); // Simplified net balances in converted currency
 
-    public Trip() {};
-    public Trip(String trip_name){
-        this.tripName = trip_name;
+    public Trip() {
+        this.tripParticipants = new ArrayList<>();
+        this.expenseList = new ArrayList<>();
+    };
+    public Trip(String tripName){
+        this.tripName = tripName;
         this.tripParticipants = new ArrayList<>();
         this.expenseList = new ArrayList<>();
     }
 
     // Getters and Setters
-    public String getName(){ return tripName; }
-    public void setName(String trip_name){ this.tripName = trip_name; }
+    public String getTripName(){ return tripName; }
+    public void setTripName(String tripName){ this.tripName = tripName; }
 
     public void addPerson(String person_name){
         Person person = new Person(person_name);

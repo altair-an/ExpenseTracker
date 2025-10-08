@@ -4,8 +4,46 @@ import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/*
+ 
+  Example JSON response for an expense:
+  {
+    "title": "Lunch",
+    "amount": 3000.00,
+    "date": "2025-10-06",
+    "currencyCode": null,
+    "exchangeRate": 148.00,
+    "tripID": 1,
+    "expenseID": 4,
+    "participants": [
+      "Person A",
+      "Person B",
+      "Person C"
+    ],
+    "payers": {
+      "Person B": 1000.00,
+      "Person A": 2000.00
+    },
+    "splits": {
+      "Person B": 1000.00,
+      "Person C": 1000.00,
+      "Person A": 1000.00
+    },
+    "balance": {
+      "Person B": 0.00,
+      "Person C": 1000.00,
+      "Person A": -1000.00
+    },
+    "convertedBalance": {
+      "Person B": 0.000,
+      "Person C": 6.757,
+      "Person A": -6.757
+    }
+  }
+ */
+
 public class ExpenseDTO {
-    @JsonProperty("expenseId")
+    @JsonProperty("expenseID")
     private Long id;
     private String title;
     private BigDecimal amount;
@@ -14,14 +52,14 @@ public class ExpenseDTO {
     private BigDecimal exchangeRate; 
     private Long tripID;  
     @JsonProperty("participants")
-    private List<String> expenseParticipants;
+    private List<String> participants;
     @JsonProperty("payers")
     private Map<String, BigDecimal> payersMap; // Map of participant name to amount they paid
     @JsonProperty("splits")
     private Map<String, BigDecimal> splitsMap; // Map of participant name to their split amount
-    @JsonProperty("balances")
+    @JsonProperty("balance")
     private Map<String, BigDecimal> expenseBalance; // Map of participant name to amount owed or to receive
-    @JsonProperty("convertedBalances")
+    @JsonProperty("convertedBalance")
     private Map<String, BigDecimal> expenseBalanceConverted; // Map of Person to amount owed or to receive in base currency
 
 
@@ -41,8 +79,8 @@ public class ExpenseDTO {
     public BigDecimal getExchangeRate() { return exchangeRate; }
     public void setExchangeRate(BigDecimal exchangeRate) { this.exchangeRate = exchangeRate; }
 
-    public List<String> getExpenseParticipants() { return expenseParticipants; }
-    public void setExpenseParticipants(List<String> expenseParticipants) { this.expenseParticipants = expenseParticipants; }
+    public List<String> getParticipants() { return participants; }
+    public void setParticipants(List<String> expenseParticipants) { this.participants = expenseParticipants; }
 
     public String getCurrencyCode() { return currencyCode; }
     public void setCurrencyCode(String currencyCode) { this.currencyCode = currencyCode; }

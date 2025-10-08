@@ -2,9 +2,8 @@ package com.altair.expensetracker.service;
 
 import com.altair.expensetracker.repository.*;
 import com.altair.expensetracker.entity.*;
-import com.altair.expensetracker.dto.ExpenseCreateDTO;
-import com.altair.expensetracker.dto.ExpenseCreateDTO.PersonDTO;
-import com.altair.expensetracker.dto.ExpenseDTO;
+import com.altair.expensetracker.dto.*;
+
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -110,7 +109,7 @@ public class ExpenseService {
         Trip trip = tripRepository.findById(tripId)
             .orElseThrow(() -> new EntityNotFoundException("Trip not found"));
         
-        Expense expense = convertCreateDTOToEntity(expenseCreateDTO);
+        Expense expense = convertToEntity(expenseCreateDTO);
         expense.setTrip(trip);    
         calculateAll(expense);
         Expense saved = expenseRepository.save(expense);
@@ -167,7 +166,7 @@ public class ExpenseService {
         for (Person person : expense.getParticipants()) {
             participantNames.add(person.getName());
         }
-        dto.setExpenseParticipants(participantNames);
+        dto.setParticipants(participantNames);
         
         Map<String, BigDecimal> payersMap = new HashMap<>();
         for (Map.Entry<Person, BigDecimal> entry : expense.getPayerMap().entrySet()) {
@@ -197,7 +196,7 @@ public class ExpenseService {
     }
 
     // DTO : Converting ExpenseCreateDTO to Expense entity for POST requests
-    public Expense convertCreateDTOToEntity(ExpenseCreateDTO dto) {
+    public Expense convertToEntity(ExpenseCreateDTO dto) {
         Expense expense = new Expense();
         expense.setTitle(dto.getTitle());
         expense.setAmount(dto.getAmount());
@@ -206,25 +205,25 @@ public class ExpenseService {
         
         // Participants
         List<Person> participants = new ArrayList<>();
-        for (PersonDTO personDTO : dto.getExpenseParticipants()) {
+        for (PersonDTO personDTO : dto.getParticipants()) {
             Person person;
-            person = personRepository.findById(personDTO.getId())
-                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + personDTO.getId()));
+            person = personRepository.findById(personDTO.getID())
+                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + personDTO.getID()));
             participants.add(person);
         }
         expense.setParticipants(participants);
 
         // Payers
         for (ExpenseCreateDTO.PayerDTO payerDTO : dto.getPayerList()) {
-            Person person = personRepository.findById(payerDTO.getPerson().getId())
-                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + payerDTO.getPerson().getId()));
+            Person person = personRepository.findById(payerDTO.getPerson().getID())
+                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + payerDTO.getPerson().getID()));
             expense.setPayer(person, payerDTO.getAmount());
         }
 
         // Splits
         for (ExpenseCreateDTO.SplitsDTO splitDTO : dto.getSplitsList()) {
-            Person person = personRepository.findById(splitDTO.getPerson().getId())
-                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + splitDTO.getPerson().getId()));
+            Person person = personRepository.findById(splitDTO.getPerson().getID())
+                .orElseThrow(() -> new NoSuchElementException("Person not found with id: " + splitDTO.getPerson().getID()));
             expense.setSplit(person, splitDTO.getAmount());
         }
 
