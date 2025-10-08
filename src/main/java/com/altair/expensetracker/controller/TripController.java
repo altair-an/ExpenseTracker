@@ -5,6 +5,7 @@ import com.altair.expensetracker.service.ExpenseService;
 import com.altair.expensetracker.service.TripService;
 import com.altair.expensetracker.dto.ExpenseCreateDTO;
 import com.altair.expensetracker.dto.ExpenseDTO;
+import com.altair.expensetracker.dto.TripDTO;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -25,12 +26,12 @@ public class TripController {
     }
 
     @GetMapping
-    public List<Trip> getAllTrips() {
+    public List<TripDTO> getAllTrips() {
         return tripService.getAllTrips();
     }
 
     @GetMapping("/{id}")
-    public Trip getTripById(@PathVariable Long id) {
+    public TripDTO getTripById(@PathVariable Long id) {
         return tripService.getTripById(id);
     }
 
